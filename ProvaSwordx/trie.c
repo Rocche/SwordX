@@ -25,12 +25,12 @@ void reallocate_tw(size_t new_size,int err_line){
         exit(EXIT_FAILURE);
     }
     trie_word[new_size]='\0';
+    tw_len = new_size-1
 
 }
 
 void search_node(char* str,trieNode* node){
 
-    tw_len = strlen(trie_word);
     str_len = strlen(str);
 
     // trie visit
@@ -96,6 +96,8 @@ void print_trie(FILE* file, trieNode* node){
         }
 
     }
+    trie_word[tw_len]='\0';
+    reallocate_tw(tw_len);
 
 }
 
@@ -118,7 +120,6 @@ void sort_trie_by_occurrencies(trieNode*){
             }
         }
     }
-
 }
 
 
