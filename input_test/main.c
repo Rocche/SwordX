@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "parameters.h"
 
 int main(int argc, char const *argv[])
 {
@@ -16,7 +17,7 @@ int main(int argc, char const *argv[])
                     printf("Unknown option -%c\n", (*argv)[1]);
                     break;
                 case 'h':
-                    printf("--help\n");
+                    help();
                     break;
                 case 'v':
                     printf("--verbose\n");
@@ -35,7 +36,9 @@ int main(int argc, char const *argv[])
             else{
                 char c = fgetc(fp);
                 while(c != EOF){
-                    printf("%c", c);
+                    if(c != ' '){
+                        printf("%c", c);
+                    }
                     c = fgetc(fp);
                 }
             }
