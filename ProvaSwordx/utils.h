@@ -1,6 +1,8 @@
 #ifndef UTILS_H_INCLUDED
 #define UTILS_H_INCLUDED
 
+#include "stddef.h"
+
 #define CHARSET 35 //   10 digits + 26 characters
 
 static const int LOWERCASE_OFFSET = 'a' - 'A';

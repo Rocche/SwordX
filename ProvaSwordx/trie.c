@@ -1,9 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
-#include <error.h>
+#include <stdio.h>
 
-#include <trie.h>
-#include <utils.h>
+#include "trie.h"
+#include "utils.h"
 
 
 trieNode* create_trie(){
@@ -13,13 +13,13 @@ trieNode* create_trie(){
         printf("Error: malloc failed for trie_root\n");
         exit(EXIT_FAILURE);
     }
-    reallocate_tw(sizeof(char)+1,LINE);
+    reallocate_tw(sizeof(char)+1,__LINE__);
 
 }
 
 void reallocate_tw(size_t new_size,int err_line){
 
-    realloc(*trie_word, new_size);
+    trie_word = realloc(trie_word, new_size);
     if (trie_word == NULL){
         printf("Error: allocation failed for trie_word on line %d\n", err_line);
         exit(EXIT_FAILURE);
@@ -33,10 +33,10 @@ void add_word(char* str,trieNode* node){
 
     str_len = strlen(str);
 
-    // trie visit
+    // visit_trie
     for (char c= *str ; c<=str_len ; c++){
 
-        trie_word[tw_len] = c
+        trie_word[tw_len] = c;
 
         if (node->children[charset_to_int(c)]!=NULL){
 
@@ -46,13 +46,13 @@ void add_word(char* str,trieNode* node){
                 exit(EXIT_FAILURE);
 
             } else if (str_len == tw_len){
-
-                node->(children[i]->(++occurences))
-                reallocate_tw(sizeof(char)+1,LINE);
+                
+                increase_occurrencies(node->children[charset_to_int(c)]);
+                reallocate_tw(sizeof(char)+1,__LINE__);
 
             } else if (str_len > tw_len){
 
-                reallocate_tw(tw_len+1,LINE);
+                reallocate_tw(tw_len+1,__LINE__);
                 get_substring(str);
                 add_word(str,node->children[charset_to_int(c)]);
 
@@ -60,10 +60,18 @@ void add_word(char* str,trieNode* node){
         } else {
 
             add_nodes(str,node);
-            reallocate_tw(sizeof(char)+1,LINE);
+            reallocate_tw(sizeof(char)+1,__LINE__);
 
         }
     }
+}
+
+void increase_occurrencies(trieNode* node){
+    node->occurrencies++;
+}
+
+void get_occurrencies(trieNode* node){
+    occurrencies=node->occurrencies;
 }
 
 void add_nodes(char* str, trieNode* node){
@@ -86,34 +94,39 @@ void print_trie(FILE* file, trieNode* node){
 
     for (int i=0;i<=CHARSET;i++){
         trie_word[tw_len] == int_to_charset(i);
-        if ((node->children[i]->occurencies)!=0){
-            fprintf( file,"%s: %i\n",trie_word,node->children[i]->occurencies )
+        if (node->children[i]!=NULL){
+
+        }
+        get_occurrencies(node->children[i]);
+         if (occurrencies!=0){
+            fprintf(file,"%s: %i\n",trie_word,occurrencies);
         }
         if (node->children[i]!=NULL){
-            reallocate_tw(tw_len+1,LINE);
+            reallocate_tw(tw_len+1,__LINE__);
             print_trie(file,node->children[i]);
         }
 
     }
-    reallocate_tw(tw_len);
+    reallocate_tw(tw_len,__LINE__);
 }
 
-sorted_list* create_sorted_list(){
+sortedList* create_sorted_list(){
 
-    sl_root = malloc(sizeof(sorted_list));
+    sl_root = malloc(sizeof(sortedList));
     if (sl_root==NULL){
-        perror("Error: malloc failed for sl_root")
+        perror("Error: malloc failed for sl_root");
         exit(EXIT_FAILURE);
     }
 
 }
 
-void sort_trie_by_occurrencies(trieNode*){
+void sort_trie_by_occurrencies(trieNode* node){
 
     for (int i=0;i<=CHARSET;i++){
-        if ((node->children[i]!=NULL){
-            if((node->children[i]->occurrencies>0)){
-
+        if ((node->children[i]!=NULL)){
+            get_occurrencies(node->children[i]);
+            if(occurrencies>0){
+                ;
             }
         }
     }
