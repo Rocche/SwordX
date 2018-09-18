@@ -6,7 +6,7 @@
 #include <utils.h>
 
 
-trieNode create_trie(){
+trieNode* create_trie(){
 
     trie_root = malloc(sizeof(trieNode));
     if (trie_root == NULL) {
@@ -25,11 +25,11 @@ void reallocate_tw(size_t new_size,int err_line){
         exit(EXIT_FAILURE);
     }
     trie_word[new_size]='\0';
-    tw_len = new_size-1
+    tw_len = new_size-1;
 
 }
 
-void search_node(char* str,trieNode* node){
+void add_word(char* str,trieNode* node){
 
     str_len = strlen(str);
 
@@ -54,7 +54,7 @@ void search_node(char* str,trieNode* node){
 
                 reallocate_tw(tw_len+1,LINE);
                 get_substring(str);
-                search_node(str,node->children[charset_to_int(c)]);
+                add_word(str,node->children[charset_to_int(c)]);
 
             }
         } else {
@@ -85,7 +85,6 @@ void add_nodes(char* str, trieNode* node){
 void print_trie(FILE* file, trieNode* node){
 
     for (int i=0;i<=CHARSET;i++){
-        tw_len = strlen(trie_word);
         trie_word[tw_len] == int_to_charset(i);
         if ((node->children[i]->occurencies)!=0){
             fprintf( file,"%s: %i\n",trie_word,node->children[i]->occurencies )
@@ -96,12 +95,10 @@ void print_trie(FILE* file, trieNode* node){
         }
 
     }
-    trie_word[tw_len]='\0';
     reallocate_tw(tw_len);
-
 }
 
-sorted_list create_sorted_list(){
+sorted_list* create_sorted_list(){
 
     sl_root = malloc(sizeof(sorted_list));
     if (sl_root==NULL){

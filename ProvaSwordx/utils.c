@@ -1,21 +1,25 @@
 #include <utils.h>
 #include <err.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 
 char int_to_charset(int n){
 
-    if (n>=0 && n<CHAR_OFFSET){return n;}
-    else if (n>CHAR_OFFSET && n<=CHARSET){ return (n-CHAR_OFFSET+BASE_CHAR);}
+    char result;
+    if (n>=0 && n<CHAR_OFFSET){result=char(n);}
+    else if (n>CHAR_OFFSET && n<=CHARSET){ result=char(n-CHAR_OFFSET+BASE_CHAR);}
     else { perror("int_to_charset() input not valid"); exit(EXIT_FAILURE)}
+    return result;
 
 }
 
-int charset_to_int(char c){
+int charset_to_int(char c;){
 
-    if (isdigit(c)){return c}
-    else if (isalpha(c)) {(return (tolower(c)-BASE_CHAR+CHAR_OFFSET))}
+    int result;
+    if (isdigit(c)){result=int(c);}
+    else if (isalpha(c)) {result= int(tolower(c)-BASE_CHAR+CHAR_OFFSET)}
     else { perror("charset_to_int() input not valid"); exit(EXIT_FAILURE)}
+    return result;
 
 }
 

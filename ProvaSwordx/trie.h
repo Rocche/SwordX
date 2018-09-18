@@ -18,10 +18,10 @@ static size_t tw_len; // trie word length
 
 trieNode* create_trie(void);
 void reallocate_tw(size_t,int);
-void search_node(char*, *trieNode);
-void add_nodes(char*, *trieNode);
-void print_trie(FILE*, *trieNode);
+void add_word(char*, trieNode*);
+void add_nodes(char*, trieNode*);
+void print_trie(FILE*, trieNode*);
 sorted_list* create_sorted_list(void);
-void add_to_sl(char*);
+void sort_by_occurencies(trieNode*);
 
 #endif // TRIE_H_INCLUDED
