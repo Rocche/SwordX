@@ -19,7 +19,7 @@ int main(int argc, char const *argv[])
                 printf("Unknown option -%c\n", (*argv)[1]);
                 break;
             case 'h':
-                help();
+                show_help();
                 break;
             case 'v':
                 printf("--verbose\n");
