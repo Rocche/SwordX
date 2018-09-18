@@ -34,6 +34,7 @@ int main(int argc, char const *argv[])
                 exit(1);
             }
             else{
+                /*
                 char c = fgetc(fp);
                 while(c != EOF){
                     if(c != ' '){
@@ -41,6 +42,11 @@ int main(int argc, char const *argv[])
                     }
                     c = fgetc(fp);
                 }
+                */
+               char *buf;
+               while(fscanf(fp, "%s", buf) == 1){
+                   printf("%s, ", buf);
+               }
             }
             printf("\n\n");
             fclose(fp);
