@@ -43,24 +43,24 @@ int main(int argc, char const *argv[])
                 char * current_str;
                 int isFirst = 1;
                 while((c = fgetc(fp)) != EOF){
-                    if(c == '\0'){
-                        //printf("%s\n", current_str);
-                        //isFirst = 1;
-                        //free(current_str);
-                        //manda al trie
-                        //libera current_str
-                        printf("a");
-                    }
-                    /*
                     if(isalpha(c) || isdigit(c)){
                         if(isFirst){
                             current_str = init_current_string();
                             isFirst = 0;
                         }
                         add_char_to_str(c, current_str);
-                        printf("%s", current_str);
+                        //printf("%s", current_str);
                     }
-                    */
+                    else{
+                        //prima controllo che esista effettivamente il current_string
+                        if(current_str != NULL){
+                            printf("%s\n", current_str);    //manda al trie
+                            isFirst = 1;
+                            free(current_str);
+                            current_str = NULL;
+                            //printf("%p", current_str);
+                        }
+                    }
                 }
             }
             //fine

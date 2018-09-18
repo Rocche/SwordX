@@ -11,19 +11,19 @@ char* init_current_string(){
         printf("Errore nella gestione della memoria (inizializzazione stringa)");
         exit(1);
     }
-    *str = 'a';
+    //*str = '\0';
     return str;
 }
 
 void add_char_to_str(char c, char* str){
     //printf("%lu\n", strlen(str));
-    str = (char*)realloc(str, strlen(str) + sizeof(char) * 2);
+    int new_length = strlen(str) + sizeof(char) * 2;
+    str = (char*)realloc(str, new_length);
     if(str == NULL){
         printf("Errore nella gestione della memoria (inizializzazione stringa)");
         exit(1);
     }
-    int length = strlen(str);
-    *(str + length - 1) = c;
-    *(str + length) = '\0';
+    *(str + new_length - 2) = c;
+    *(str + new_length - 1) = '\0';
     //printf("%c",c);
 }
