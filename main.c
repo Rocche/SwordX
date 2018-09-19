@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
                 break;
             case 'h':
                 show_help();
-                exit(0);
+                exit(EXIT_SUCCESS);
             case 'v':
                 printf("--verbose\n");
                 break;
@@ -30,6 +30,7 @@ int main(int argc, char const *argv[])
         else
         {
             analyze_file(*argv);
+            analyze_directory(*argv);
         }
     }
     return 0;

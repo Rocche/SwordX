@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <dirent.h>
 #include "utils.h"
 
 //metodo che inizializza l'allocazione di memoria della stringa da far elaborare
@@ -30,7 +31,6 @@ void add_char_to_str(char c, char *str)
     }
     *(str + new_length - 2) = c;
     *(str + new_length - 1) = '\0';
-    //printf("%c",c);
 }
 
 //metodo che elabora le stringhe di un file
@@ -41,8 +41,8 @@ void analyze_file(const char *path)
     //se non è stato trovato il file
     if (fp == NULL)
     {
-        printf("File %s non trovato.\n", path);
-        exit(1);
+        perror("Could not open the file");
+        //exit(EXIT_FAILURE);
     }
     else
     {
@@ -59,7 +59,6 @@ void analyze_file(const char *path)
                     isFirst = 0;
                 }
                 add_char_to_str(c, current_str);
-                //printf("%s", current_str);
             }
             else
             {
@@ -70,10 +69,29 @@ void analyze_file(const char *path)
                     isFirst = 1;
                     free(current_str);
                     current_str = NULL;
-                    //printf("%p", current_str);
                 }
             }
         }
+        fclose(fp);
     }
-    fclose(fp);
+    printf("\n\n");
+}
+
+//metodo che elabora i file regolari in una directory
+void analyze_directory(const char *path)
+{
+    DIR *dp;
+    struct dirent *ep;
+
+    dp = opendir(path);
+    if (dp != NULL)
+    {
+        while (ep = readdir(dp)){
+            puts(ep->d_name);
+        }
+        closedir(dp);
+    }
+    else{
+        perror("Couldn't open the directory");
+    }
 }
