@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <dirent.h>
-#include "utils.h"
+#include <sys/stat.h>
+
+#include "file_operations.h"
 
 //metodo che inizializza l'allocazione di memoria della stringa da far elaborare
 //al trie. La dimensione è 1 carattere + carattere terminazione '\0'
@@ -31,6 +33,13 @@ void add_char_to_str(char c, char *str)
     }
     *(str + new_length - 2) = c;
     *(str + new_length - 1) = '\0';
+}
+
+//metodo che controlla se il file specificato è regular
+int is_regular_file(const char *path){
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
 }
 
 //metodo che elabora le stringhe di un file
@@ -81,13 +90,19 @@ void analyze_file(const char *path)
 void analyze_directory(const char *path)
 {
     DIR *dp;
+    //struttura contiene d_name, ovvero il nome del file in questione
     struct dirent *ep;
 
     dp = opendir(path);
     if (dp != NULL)
     {
         while (ep = readdir(dp)){
-            puts(ep->d_name);
+            char *file_path = malloc(strlen(path) + strlen(ep -> d_name) + 1);
+            strcpy(file_path, path);
+            strcat(file_path, ep -> d_name);
+            if(is_regular_file(file_path)){
+                printf("regular: %s\n", file_path);
+            }
         }
         closedir(dp);
     }

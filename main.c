@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "parameters.h"
-#include "utils.h"
+#include "file_operations.h"
 
 int main(int argc, char const *argv[])
 {
@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
         //altrimenti è un parametro di input
         else
         {
-            analyze_file(*argv);
+            //analyze_file(*argv);
             analyze_directory(*argv);
         }
     }
