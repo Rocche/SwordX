@@ -51,12 +51,14 @@ void analyze_file(const char *path)
     if (fp == NULL)
     {
         perror("Could not open the file");
-        //exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
     else
     {
         char c;
-        char *current_str;
+        //inizializzo a NULL per evitare errori nella gestione della 
+        //memoria in caso di file che iniziano con valori non corretti
+        char *current_str = NULL;
         int isFirst = 1;
         while ((c = fgetc(fp)) != EOF)
         {
@@ -101,8 +103,9 @@ void analyze_directory(const char *path)
             strcpy(file_path, path);
             strcat(file_path, ep -> d_name);
             if(is_regular_file(file_path)){
-                printf("regular: %s\n", file_path);
+                analyze_file(file_path);
             }
+            free(file_path);
         }
         closedir(dp);
     }
