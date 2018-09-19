@@ -16,3 +16,9 @@ void analyze_file(const char*);
 
 //elabora i file regolari di una directory intera
 void analyze_directory(const char*);
+
+//controlla se il file è regular
+int is_regular_file(const char*);
+
+//controlla se la stringa passate è il percorso per una directory
+int is_directory(const char*);

@@ -30,7 +30,16 @@ int main(int argc, char const *argv[])
         else
         {
             //analyze_file(*argv);
-            analyze_directory(*argv);
+            if(is_regular_file(*argv)){
+                analyze_file(*argv);
+            }
+            else if(is_directory(*argv)){
+                analyze_directory(*argv);
+            }
+            else{
+                perror("Argomento non riconosciuto");
+                exit(EXIT_FAILURE);
+            }
         }
     }
     return 0;

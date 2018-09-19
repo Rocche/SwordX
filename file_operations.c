@@ -42,6 +42,13 @@ int is_regular_file(const char *path){
     return S_ISREG(path_stat.st_mode);
 }
 
+//metodo che controlla se la stringa passata è il percorso per una directory
+int is_directory(const char* path) {
+    struct stat buf;
+    stat(path, &buf);
+    return S_ISDIR(buf.st_mode);
+}
+
 //metodo che elabora le stringhe di un file
 void analyze_file(const char *path)
 {
