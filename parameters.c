@@ -24,5 +24,5 @@ void show_help(){
     printf("\t<path/file1> <path/file2> <path/file3>...: specifies multiple files to analyze\n\n");
     printf("EXAMPLES:\n");
     printf("\tswordx Documents/myFolder/pippo.txt\tcount occurencies in pippo.txt and print the result in alphabetical order\n");
-    printf("\tswordx Documents/myFolder/ -r -a -o Documents/Results/output.txt\tcount occurencies in all regular files in folder Documents, with subdirectories too, and print the result in alphabetical order\n");
+    printf("\tswordx Documents/myFolder/ -r -a -o Documents/Results/output.txt\tcount occurencies in all regular files in folder Documents, with subdirectories too, and print the result in alphabetical order\n\n");
 }

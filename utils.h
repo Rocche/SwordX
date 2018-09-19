@@ -9,3 +9,6 @@ static char* current_str;
 char* init_current_string();
 //aggiunge un carattere all'allocazione
 void add_char_to_str(char, char*);
+
+//elabora le stringhe di un file
+void analyze_file(const char*);

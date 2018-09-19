@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
+
 #include "parameters.h"
 #include "utils.h"
 
@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
                 break;
             case 'h':
                 show_help();
-                break;
+                exit(0);
             case 'v':
                 printf("--verbose\n");
                 break;
@@ -29,43 +29,7 @@ int main(int argc, char const *argv[])
         //altrimenti è un parametro di input
         else
         {
-            printf("Si è scelto di contare le occorrenze di %s\n\n", (*argv));
-            fp = fopen(*argv, "r");
-            //se non è stato trovato il file
-            if (fp == NULL)
-            {
-                printf("File non trovato.\n");
-                exit(1);
-            }
-            else
-            {
-                char c;
-                char * current_str;
-                int isFirst = 1;
-                while((c = fgetc(fp)) != EOF){
-                    if(isalpha(c) || isdigit(c)){
-                        if(isFirst){
-                            current_str = init_current_string();
-                            isFirst = 0;
-                        }
-                        add_char_to_str(c, current_str);
-                        //printf("%s", current_str);
-                    }
-                    else{
-                        //prima controllo che esista effettivamente il current_string
-                        if(current_str != NULL){
-                            printf("%s\n", current_str);    //manda al trie
-                            isFirst = 1;
-                            free(current_str);
-                            current_str = NULL;
-                            //printf("%p", current_str);
-                        }
-                    }
-                }
-            }
-            //fine
-            printf("\n\n");
-            fclose(fp);
+            analyze_file(*argv);
         }
     }
     return 0;
