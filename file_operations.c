@@ -96,27 +96,53 @@ void analyze_file(const char *path)
 }
 
 //metodo che elabora i file regolari in una directory
-void analyze_directory(const char *path)
+void analyze_directory(const char *path, int recursive)
 {
     DIR *dp;
     //struttura contiene d_name, ovvero il nome del file in questione
     struct dirent *ep;
+    //un utente potrebbe anche non specificare il carattere '/'
+    //alla fine del percorso: in quel caso si aggiunge
+    char* directory_path = (char *)malloc(strlen(path) + sizeof(char));
+    strcpy(directory_path, path);
+    if(*(directory_path + strlen(path) - 1) != '/'){
+        int new_length = strlen(path) + sizeof(char) * 2;
+        directory_path = (char *)realloc(directory_path, new_length);
+        *(directory_path + new_length - 2) = '/';
+        *(directory_path + new_length - 1) = '\0';
+    }
+    else{
+        *(directory_path + strlen(path)) = '\0';
+    }
 
-    dp = opendir(path);
+    dp = opendir(directory_path);
     if (dp != NULL)
     {
         while (ep = readdir(dp)){
-            char *file_path = malloc(strlen(path) + strlen(ep -> d_name) + 1);
-            strcpy(file_path, path);
-            strcat(file_path, ep -> d_name);
-            if(is_regular_file(file_path)){
-                analyze_file(file_path);
+            //creazione stringa del file/directory
+            char *new_path = (char*)malloc(strlen(directory_path) + strlen(ep -> d_name) + sizeof(char));
+            strcpy(new_path, directory_path);
+            strcat(new_path, ep -> d_name);
+            printf("%s\n", new_path);
+            if(is_regular_file(new_path)){
+                //analyze_file(new_path);
+                printf("a\n");
+                free(new_path);
             }
-            free(file_path);
+            if(recursive){
+                if(is_directory(new_path)){
+                    //bisogna escludere le directory di tipo /. e /..
+                    if(*(new_path + strlen(new_path) - 1) != '.'){
+                        analyze_directory(new_path, 1);
+                        free(new_path);
+                    }
+                }
+            }
         }
         closedir(dp);
     }
     else{
         perror("Couldn't open the directory");
     }
+    free(directory_path);
 }

@@ -15,7 +15,8 @@ void add_char_to_str(char, char*);
 void analyze_file(const char*);
 
 //elabora i file regolari di una directory intera
-void analyze_directory(const char*);
+//il secondo parametro segnala se l'analisi è ricorsiva
+void analyze_directory(const char*, int);
 
 //controlla se il file è regular
 int is_regular_file(const char*);

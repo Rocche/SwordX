@@ -6,7 +6,16 @@
 
 int main(int argc, char const *argv[])
 {
-    FILE *fp;
+    //inizializzazione opzioni
+    int recursive = 0;
+    int follow = 0;
+    int exclude = 0;
+    int alpha = 0;
+    int min = 0;
+    int ignore = 0;
+    int sort_by_occurency = 0;
+    int log = 0;
+
     //controllo argomenti da linea di comando
     while (*(++argv))
     {
@@ -21,22 +30,49 @@ int main(int argc, char const *argv[])
             case 'h':
                 show_help();
                 exit(EXIT_SUCCESS);
-            case 'v':
-                printf("--verbose\n");
+            case 'r':
+                recursive = 1;
+                break;
+            case 'e':
+                exclude = 1;
+                break;
+            case 'a':
+                alpha = 1;
+                break;
+            case 'm':
+                min = 1;
+                break;
+            case 'i':
+                ignore = 1;
+                break;
+            case 's':
+                sort_by_occurency = 1;
+                break;
+            case 'l':
+                log = 1;
                 break;
             }
         }
         //altrimenti è un parametro di input
         else
         {
-            //analyze_file(*argv);
-            if(is_regular_file(*argv)){
+            if (is_regular_file(*argv))
+            {
                 analyze_file(*argv);
             }
-            else if(is_directory(*argv)){
-                analyze_directory(*argv);
+            else if (is_directory(*argv))
+            {
+                if (recursive)
+                {
+                    analyze_directory(*argv, 1);
+                }
+                else
+                {
+                    analyze_directory(*argv, 0);
+                }
             }
-            else{
+            else
+            {
                 perror("Argomento non riconosciuto");
                 exit(EXIT_FAILURE);
             }
