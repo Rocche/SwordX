@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 
 #include "file_operations.h"
+#include "file_node.h"
 
 //metodo che inizializza l'allocazione di memoria della stringa da far elaborare
 //al trie. La dimensione è 1 carattere + carattere terminazione '\0'
@@ -36,14 +37,16 @@ void add_char_to_str(char c, char *str)
 }
 
 //metodo che controlla se il file specificato è regular
-int is_regular_file(const char *path){
+int is_regular_file(const char *path)
+{
     struct stat path_stat;
     stat(path, &path_stat);
     return S_ISREG(path_stat.st_mode);
 }
 
 //metodo che controlla se la stringa passata è il percorso per una directory
-int is_directory(const char* path) {
+int is_directory(const char *path)
+{
     struct stat buf;
     stat(path, &buf);
     return S_ISDIR(buf.st_mode);
@@ -63,7 +66,7 @@ void analyze_file(const char *path)
     else
     {
         char c;
-        //inizializzo a NULL per evitare errori nella gestione della 
+        //inizializzo a NULL per evitare errori nella gestione della
         //memoria in caso di file che iniziano con valori non corretti
         char *current_str = NULL;
         int isFirst = 1;
@@ -84,6 +87,7 @@ void analyze_file(const char *path)
                 if (current_str != NULL)
                 {
                     printf("%s\n", current_str); //manda al trie
+                    //printf("a\n");
                     isFirst = 1;
                     free(current_str);
                     current_str = NULL;
@@ -96,53 +100,56 @@ void analyze_file(const char *path)
 }
 
 //metodo che elabora i file regolari in una directory
-void analyze_directory(const char *path, int recursive)
+//ritorna il primo FileNode
+void analyze_directory(const char *path, int recursive/*, FileNode* first*/)
 {
-    DIR *dp;
-    //struttura contiene d_name, ovvero il nome del file in questione
-    struct dirent *ep;
-    //un utente potrebbe anche non specificare il carattere '/'
-    //alla fine del percorso: in quel caso si aggiunge
-    char* directory_path = (char *)malloc(strlen(path) + sizeof(char));
-    strcpy(directory_path, path);
-    if(*(directory_path + strlen(path) - 1) != '/'){
-        int new_length = strlen(path) + sizeof(char) * 2;
-        directory_path = (char *)realloc(directory_path, new_length);
-        *(directory_path + new_length - 2) = '/';
-        *(directory_path + new_length - 1) = '\0';
-    }
-    else{
-        *(directory_path + strlen(path)) = '\0';
-    }
+    //puntatore al filenode corrente (inizializzato al first)
+    //FileNode* current_file_node = first;
 
-    dp = opendir(directory_path);
-    if (dp != NULL)
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(path)) != NULL)
     {
-        while (ep = readdir(dp)){
-            //creazione stringa del file/directory
-            char *new_path = (char*)malloc(strlen(directory_path) + strlen(ep -> d_name) + sizeof(char));
-            strcpy(new_path, directory_path);
-            strcat(new_path, ep -> d_name);
-            printf("%s\n", new_path);
-            if(is_regular_file(new_path)){
-                //analyze_file(new_path);
-                printf("a\n");
+        while ((ent = readdir(dir)) != NULL)
+        {
+            char *filename = ent->d_name;
+            if (strcmp(filename, ".") != 0 && strcmp(filename, "..") != 0)
+            {
+                size_t path_size = (strlen(path) + strlen(filename) + 1);
+                char *new_path = (char *)malloc(path_size * sizeof(char));
+                //check_heap(path);
+                strcpy(new_path, path);
+                //se non c'è il carattere '/', realloco e aggiungo
+                if(*(new_path + strlen(new_path) - 1) != '/'){
+                    new_path = (char *)realloc(new_path, (path_size + 1)*sizeof(char));
+                    strcat(new_path, "/");
+                }
+                strcat(new_path, filename);
+                //aggiungo carattere '/0'
+                *(new_path + strlen(new_path)) = '\0';
+                if (is_regular_file(new_path)){
+                    //printf("%s\n", new_path);
+                    //FileNode* new_file_node = add_FileNode(new_path, current_file_node);
+                    //current_file_node = new_file_node;
+                    analyze_file(new_path);
+                }
+                if (is_directory(new_path) && recursive){
+                    analyze_directory(new_path, 1/*, current_file_node*/);
+                }
                 free(new_path);
             }
-            if(recursive){
-                if(is_directory(new_path)){
-                    //bisogna escludere le directory di tipo /. e /..
-                    if(*(new_path + strlen(new_path) - 1) != '.'){
-                        analyze_directory(new_path, 1);
-                        free(new_path);
-                    }
-                }
-            }
         }
-        closedir(dp);
     }
-    else{
-        perror("Couldn't open the directory");
+}
+
+void printFileNodes(FileNode *first)
+{
+    FileNode *current_file_node = first;
+    printf("FILE PRESI:\n");
+    while (current_file_node != NULL)
+    {
+        printf("%s\n", current_file_node->file_path);
+        current_file_node = current_file_node->next;
     }
-    free(directory_path);
+    printf("Finito\n");
 }

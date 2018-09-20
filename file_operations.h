@@ -1,6 +1,9 @@
+#ifndef FILE_OPERATIONS_H
+#define FILE_OPERATIONS_H
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "file_node.h"
 
 //stringa corrente
 static char* current_str;
@@ -23,3 +26,7 @@ int is_regular_file(const char*);
 
 //controlla se la stringa passate è il percorso per una directory
 int is_directory(const char*);
+
+void printFileNodes(FileNode*);
+
+#endif //FILE_OPERATIONS_H

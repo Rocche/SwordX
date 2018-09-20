@@ -3,6 +3,7 @@
 
 #include "parameters.h"
 #include "file_operations.h"
+#include "file_node.h"
 
 int main(int argc, char const *argv[])
 {
@@ -56,6 +57,8 @@ int main(int argc, char const *argv[])
         //altrimenti è un parametro di input
         else
         {
+            //FileNode* first_file_node = init_FileNode();
+
             if (is_regular_file(*argv))
             {
                 analyze_file(*argv);
@@ -64,11 +67,14 @@ int main(int argc, char const *argv[])
             {
                 if (recursive)
                 {
-                    analyze_directory(*argv, 1);
+                    analyze_directory(*argv, 1/*, first_file_node*/);
+                    //printf("Il prossimo nodo del primo è: %s\n", first_file_node->next->file_path);
+                    //printFileNodes(first_file_node);
                 }
                 else
                 {
-                    analyze_directory(*argv, 0);
+                    analyze_directory(*argv, 0/*, first_file_node*/);
+                    //printFileNodes(first_file_node);
                 }
             }
             else
