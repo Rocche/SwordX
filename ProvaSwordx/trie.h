@@ -2,33 +2,29 @@
 #define TRIE_H_INCLUDED
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "utils.h"
 
-typedef struct trieNode{
-    struct trieNode* children[CHARSET];
-    int occurrencies;
-}trieNode;
+//  stuctures
 
-typedef struct sortedList{
-    char *occurrencies;
-}sortedList;
+    typedef struct trieNode{
+        int occurrencies;
+        struct trieNode* children[CHARSET];
+    }trieNode;
 
-static trieNode *trie_root; // trie root node
-static struct sortedList *sl_root; // sorted list root node
 
-static char *trie_word; // word built visiting node after node
-static size_t tw_len; // trie word length
 
-static int occurrencies;
+//  trie management functions
 
-trieNode* create_trie(void);
-void reallocate_tw(size_t,int);
-void add_word(char*, trieNode*);
-void increase_occurrencies(trieNode*);
-void get_occurrencies(trieNode*);
-void add_nodes(char*, trieNode*);
-void print_trie(FILE*, trieNode*);
-sortedList* create_sortedList(void);
-void sort__trie_by_occurencies(trieNode*);
+    void increase_occurrencies(trieNode*);
+    int get_occurrencies(trieNode*);
+
+    trieNode* create_trieNode(trieNode*);
+    void add_word(trieNode*,char*,char*,int);
+    trieNode* add_nodes(trieNode*, char*,int);
+    void print_trie(FILE*, trieNode*,char*,int);
+    occurrencyNode** sort_trie_by_occurrencies(occurrencyNode**,trieNode*,char*,int);
+    occurrencyNode** add_to_sbolist(occurrencyNode**,char*,int);
+    void print_sorted_list(void);
 
 #endif // TRIE_H_INCLUDED

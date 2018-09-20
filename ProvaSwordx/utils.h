@@ -11,10 +11,11 @@ static const char BASE_DIGIT = '0';
 static const char BASE_CHAR = 'a';
 static const int CHAR_OFFSET = 10;
 
-static size_t str_len; // input string length
-
+//  functions
+char* allocate_str(char*,int);
+char* reallocate_str(char*,size_t,int);
+char* clear_str(char*);
 char int_to_charset(int);
 int charset_to_int(char);
-char* get_substring(char*);
 
 #endif // UTILS_H_INCLUDED
