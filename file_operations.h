@@ -11,14 +11,6 @@ char* init_current_string();
 //aggiunge un carattere all'allocazione
 void add_char_to_str(char, char*);
 
-//elabora le stringhe di un file
-//usato const char* perchè il parametro deve essere argv*
-void analyze_file(const char*, int, bool);
-
-//elabora i file regolari di una directory intera
-//il secondo parametro segnala se l'analisi è ricorsiva
-void analyze_directory(const char*, int, int, bool);
-
 //controlla se il file è regular
 bool is_regular_file(const char*);
 

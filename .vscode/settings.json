@@ -3,6 +3,7 @@
         "utils.h": "c",
         "file_list.h": "c",
         "parameters.h": "c",
-        "wchar.h": "c"
+        "wchar.h": "c",
+        "file_operations.h": "c"
     }
 }
