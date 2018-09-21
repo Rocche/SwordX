@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "errno.h": "c",
-        "stdio.h": "c"
+        "trie.h": "c",
+        "cstdlib": "c",
+        "ctype.h": "c"
     }
 }

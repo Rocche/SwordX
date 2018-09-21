@@ -4,27 +4,25 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "utils.h"
-
-//  stuctures
+#include "sbolist.h"
 
     typedef struct trieNode{
         int occurrencies;
         struct trieNode* children[CHARSET];
     }trieNode;
 
-
-
 //  trie management functions
 
-    void increase_occurrencies(trieNode*);
-    int get_occurrencies(trieNode*);
+    char int_to_charset(int);
+    int charset_to_int(char);
+    void allocate_trie_word(char*,int);
 
-    trieNode* create_trieNode(trieNode*);
-    void add_word(trieNode*,char*,char*,int);
+    trieNode* create_trieNode();
+    void add_word(trieNode*,char*);
     trieNode* add_nodes(trieNode*, char*,int);
-    void print_trie(FILE*, trieNode*,char*,int);
-    occurrencyNode** sort_trie_by_occurrencies(occurrencyNode**,trieNode*,char*,int);
+    void print_trie(FILE*, trieNode*);
+    
+    occurrencyNode** sort_trie_by_occurrencies(trieNode*);
     occurrencyNode** add_to_sbolist(occurrencyNode**,char*,int);
-    void print_sorted_list(void);
 
 #endif // TRIE_H_INCLUDED

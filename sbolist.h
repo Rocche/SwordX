@@ -18,9 +18,9 @@
 
 //  sorted list management functions
 
-    occurrencyNode* create_sl_root (occurrencyNode*);
-    occurrencyNode* reallocate_sl_root(occurrencyNode*);
-    occurrencyNode* create_occurrencyNode(occurrencyNode*, int occurrency);
-    sortedNode* create_sortedNode (sortedNode*,char*);
+    occurrencyNode* create_occurrencyNode(int occurrency);
+    sortedNode* create_sortedNode (char*);
+    int compare_occurrencyNodes (const void*,const void*);
+    void print_sorted_list(FILE* ,occurrencyNode**);
 
 #endif // SORTED_LIST_H_INCLUDED
