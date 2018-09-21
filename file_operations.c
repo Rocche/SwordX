@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 #include "file_operations.h"
-#include "heap.h"
+#include "utils.h"
 
 //metodo che inizializza l'allocazione di memoria della stringa da far elaborare
 //al trie. La dimensione è 1 carattere + carattere terminazione '\0'

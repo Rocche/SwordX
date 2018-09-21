@@ -10,7 +10,7 @@
 #include <argz.h>
 #include <dirent.h>
 #include "file_operations.h"
-#include "heap.h"
+#include "utils.h"
 
 //inizializzazione opzioni
 bool recursive = false;
@@ -184,28 +184,6 @@ void analyze_directory(const char *path)
     }
 }
 
-
-int main(void){
-
-    trieNode* trie_root = create_trieNode();
-    bool sorted = false;
-    FILE* dest_fp;
-
-    if (sorted==false) {
-        print_trie( dest_fp, trie_root); 
-    } else {
-        occurrencyNode** sl_root; // sorted list occurrencyNodes pointer
-        sl_root = sort_trie_by_occurrencies(trie_root);
-        qsort (sl_root, sizeof(sl_root)/sizeof(occurrencyNode*),sizeof(occurrencyNode*),compare_occurrencyNodes);
-        print_sorted_list(dest_fp, sl_root);
-    }
-
-    fclose(dest_fp);
-    
-    return 0;
-
-}
-
 int main(int argc, char **argv)
 {
     /*contiene la descrizione delle opzioni*/
@@ -223,6 +201,23 @@ int main(int argc, char **argv)
     struct arguments arguments;
     //contiene le opzioni, callback function e descrittore in usage
     struct argp argp = {options, parse_opt, "<input1> <input2> ... <inputn>", "Count words occurencies in specified files or directories and save the reuslt in a .txt file"};
+
+    /*iniaizlizzazione trie*/
+    trieNode* trie_root = create_trieNode();
+    bool sorted = false;
+    FILE* dest_fp;
+
+    if (sorted==false) {
+        print_trie( dest_fp, trie_root); 
+    } else {
+        occurrencyNode** sl_root; // sorted list occurrencyNodes pointer
+        sl_root = sort_trie_by_occurrencies(trie_root);
+        qsort (sl_root, sizeof(sl_root)/sizeof(occurrencyNode*),sizeof(occurrencyNode*),compare_occurrencyNodes);
+        print_sorted_list(dest_fp, sl_root);
+    }
+
+    fclose(dest_fp);
+
 
     if (argp_parse(&argp, argc, argv, 0, 0, &arguments) == 0)
     {
