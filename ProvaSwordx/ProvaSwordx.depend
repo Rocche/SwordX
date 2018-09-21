@@ -1,6 +1,0 @@
-# depslib dependency file v1.0
-1536944123 source:/home/ale/Desktop/ProjectsC/ProvaSwordx/main.c
-	<stdio.h>
-	<stdlib.h>
-	<ctype.h>
-
