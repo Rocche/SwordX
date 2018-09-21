@@ -22,6 +22,11 @@ bool ignore = false;
 bool sort_by_occurency = false;
 bool log_flag = false;
 
+/*root trie*/
+trieNode* trie_root;
+/*output*/
+FILE* dest_fp;
+
 /*inizializza automaticamente l'opzione --version*/
 const char *argp_program_version = "version 1.0";
 /*struct per i parametri*/
@@ -133,6 +138,7 @@ void analyze_file(const char *path)
             }
 
             if(is_valid){
+                add_word(trie_root, word);
                 printf("%s\n", word);
             }
 
@@ -203,21 +209,9 @@ int main(int argc, char **argv)
     struct argp argp = {options, parse_opt, "<input1> <input2> ... <inputn>", "Count words occurencies in specified files or directories and save the reuslt in a .txt file"};
 
     /*iniaizlizzazione trie*/
-    trieNode* trie_root = create_trieNode();
-    bool sorted = false;
-    FILE* dest_fp;
-
-    if (sorted==false) {
-        print_trie( dest_fp, trie_root); 
-    } else {
-        occurrencyNode** sl_root; // sorted list occurrencyNodes pointer
-        sl_root = sort_trie_by_occurrencies(trie_root);
-        qsort (sl_root, sizeof(sl_root)/sizeof(occurrencyNode*),sizeof(occurrencyNode*),compare_occurrencyNodes);
-        print_sorted_list(dest_fp, sl_root);
-    }
-
-    fclose(dest_fp);
-
+    trie_root = create_trieNode();
+    bool sorted = sort_by_occurency;
+    
 
     if (argp_parse(&argp, argc, argv, 0, 0, &arguments) == 0)
     {
@@ -242,16 +236,28 @@ int main(int argc, char **argv)
                 analyze_file(argument);
             }
             else if(is_directory(argument)){
-                if(recursive){
-                    analyze_directory(argument);
-                }
-                else{
-                    analyze_directory(argument);
-                }
+                analyze_directory(argument);
             }
         }
         printf("\n");
         free(arguments.argz);
     }
+
+    dest_fp = fopen("output.txt", "w");
+    if(dest_fp == NULL){
+        perror("can't open dir");
+        exit(EXIT_FAILURE);
+    }
+    if (sorted==false) {
+        print_trie( dest_fp, trie_root); 
+    } else {
+        occurrencyNode** sl_root; // sorted list occurrencyNodes pointer
+        sl_root = sort_trie_by_occurrencies(trie_root);
+        qsort (sl_root, sizeof(sl_root)/sizeof(occurrencyNode*),sizeof(occurrencyNode*),compare_occurrencyNodes);
+        print_sorted_list(dest_fp, sl_root);
+    }
+
+    fclose(dest_fp);
+
     return 0;
 }
