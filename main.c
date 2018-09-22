@@ -22,8 +22,12 @@ bool ignore = false;
 bool sort_by_occurency = false;
 bool log_flag = false;
 
+/*blacklist*/
+char** blacklist = NULL;
+size_t blacklist_size = 0;
+
 /*root trie*/
-trieNode* trie_root;
+trieNode* trie_root = NULL;
 /*output*/
 FILE* dest_fp;
 
@@ -35,6 +39,36 @@ struct arguments
     char *argz;
     size_t argz_len;
 };
+
+/*crea la blacklist di parole da ignorare contenute in un file*/
+
+char** create_word_blacklist(const char* path){
+
+    FILE* fp = fopen(path, "r");
+    if(fp == NULL){
+        perror("Could not open the ignore file");
+        exit(EXIT_FAILURE);
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+
+    while (getline(&line, &len, fp) != -1)
+    {
+        if (*(line + strlen(line) - 1) == '\n'){
+            *(line + strlen(line) - 1) = '\0';
+        }
+
+        blacklist = (char**)realloc(blacklist, (blacklist_size + 1)*sizeof(char*));
+        check_heap(blacklist);
+        *(blacklist + blacklist_size) = (char*)malloc(strlen(line));
+        check_heap(*(blacklist + blacklist_size));
+        strcpy(*(blacklist + blacklist_size), line);
+        blacklist_size++;
+    }
+    fclose(fp);
+}
+
 /*Azioni in base al tipo di opzione*/
 static int parse_opt(int key, char *arg, struct argp_state *state)
 {
@@ -57,7 +91,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         min = atoi(arg);
         break;
     case 'i':
-        ignore = true;
+        create_word_blacklist(arg);
         break;
     case 's':
         sort_by_occurency = true;
@@ -112,24 +146,14 @@ void analyze_file(const char *path)
             {
                 if (alpha)
                 {
-                    for (int i = 0; i < strlen(word); i++)
-                    {
-                        if (!isalpha(*(word + i)))
-                        {
-                            is_valid = false;
-                            break;
-                        }
+                    if(!is_alphabetical_string(word) || is_in_blacklist(word, blacklist, blacklist_size)){
+                        is_valid = false;
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < strlen(word); i++)
-                    {
-                        if (!isalpha(*(word + i)) && !isdigit(*(word + i)))
-                        {
-                            is_valid = false;
-                            break;
-                        }
+                    if(!is_alphanumerical_string(word) || is_in_blacklist(word, blacklist, blacklist_size)){
+                        is_valid = false;
                     }
                 }
             }
@@ -138,8 +162,8 @@ void analyze_file(const char *path)
             }
 
             if(is_valid){
-                add_word(trie_root, word);
                 printf("%s\n", word);
+                //add_word(trie_root, word);
             }
 
             word = strtok_r(NULL, " ", &save);
@@ -210,6 +234,7 @@ int main(int argc, char **argv)
 
     /*iniaizlizzazione trie*/
     trie_root = create_trieNode();
+    printf("creato\n");
     bool sorted = sort_by_occurency;
     
 
@@ -242,7 +267,7 @@ int main(int argc, char **argv)
         printf("\n");
         free(arguments.argz);
     }
-
+    /*
     dest_fp = fopen("output.txt", "w");
     if(dest_fp == NULL){
         perror("can't open dir");
@@ -258,6 +283,6 @@ int main(int argc, char **argv)
     }
 
     fclose(dest_fp);
-
+    */
     return 0;
 }

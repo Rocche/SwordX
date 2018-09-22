@@ -60,3 +60,35 @@ bool is_symbolic_link(const char *path)
     }
     return S_ISLNK(buf.st_mode) ? true : false;
 }
+
+
+bool is_alphanumerical_string(char* word){
+    for (int i = 0; i < strlen(word); i++)
+    {
+        if (!isalpha(*(word + i)) && !isdigit(*(word + i)))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool is_alphabetical_string(char* word){
+    for (int i = 0; i < strlen(word); i++)
+    {
+        if (!isalpha(*(word + i)))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool is_in_blacklist(char* word, char** blacklist, size_t blacklist_size){
+    for(int i = 0; i < blacklist_size; i++){
+        if(strcmp(word, *(blacklist + i)) == 0){
+            return true;
+        }
+    }
+    return false;
+}
