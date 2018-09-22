@@ -18,13 +18,16 @@ bool follow = false;
 bool exclude = false;
 bool alpha = false;
 int min = 0;
-bool ignore = false;
 bool sort_by_occurency = false;
 bool log_flag = false;
 
-/*blacklist*/
-char** blacklist = NULL;
-size_t blacklist_size = 0;
+/*word blacklist (--ignore)*/
+char** word_blacklist = NULL;
+size_t word_blacklist_size = 0;
+
+/*file blacklist (--exclude)*/
+char** file_blacklist = NULL;
+size_t file_blacklist_size = 0;
 
 /*root trie*/
 trieNode* trie_root = NULL;
@@ -42,7 +45,7 @@ struct arguments
 
 /*crea la blacklist di parole da ignorare contenute in un file*/
 
-char** create_word_blacklist(const char* path){
+char** update_word_blacklist(const char* path){
 
     FILE* fp = fopen(path, "r");
     if(fp == NULL){
@@ -59,14 +62,23 @@ char** create_word_blacklist(const char* path){
             *(line + strlen(line) - 1) = '\0';
         }
 
-        blacklist = (char**)realloc(blacklist, (blacklist_size + 1)*sizeof(char*));
-        check_heap(blacklist);
-        *(blacklist + blacklist_size) = (char*)malloc(strlen(line));
-        check_heap(*(blacklist + blacklist_size));
-        strcpy(*(blacklist + blacklist_size), line);
-        blacklist_size++;
+        word_blacklist = (char**)realloc(word_blacklist, (word_blacklist_size + 1)*sizeof(char*));
+        check_heap(word_blacklist);
+        *(word_blacklist + word_blacklist_size) = (char*)malloc(strlen(line));
+        check_heap(*(word_blacklist + word_blacklist_size));
+        strcpy(*(word_blacklist + word_blacklist_size), line);
+        word_blacklist_size++;
     }
     fclose(fp);
+}
+
+char** update_file_blacklist(const char* file){
+    file_blacklist = (char**)realloc(file_blacklist, (file_blacklist_size + 1)*sizeof(char*));
+    check_heap(file_blacklist);
+    *(file_blacklist + file_blacklist_size) = (char*)malloc(strlen(file));
+    check_heap(*(file_blacklist + file_blacklist_size));
+    strcpy(*(file_blacklist + file_blacklist_size), file);
+    file_blacklist_size++;
 }
 
 /*Azioni in base al tipo di opzione*/
@@ -79,7 +91,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         recursive = true;
         break;
     case 'e':
-        exclude = true;
+        update_file_blacklist(arg);
         break;
     case 'f':
         follow = true;
@@ -91,7 +103,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         min = atoi(arg);
         break;
     case 'i':
-        create_word_blacklist(arg);
+        update_word_blacklist(arg);
         break;
     case 's':
         sort_by_occurency = true;
@@ -146,13 +158,13 @@ void analyze_file(const char *path)
             {
                 if (alpha)
                 {
-                    if(!is_alphabetical_string(word) || is_in_blacklist(word, blacklist, blacklist_size)){
+                    if(!is_alphabetical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size)){
                         is_valid = false;
                     }
                 }
                 else
                 {
-                    if(!is_alphanumerical_string(word) || is_in_blacklist(word, blacklist, blacklist_size)){
+                    if(!is_alphanumerical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size)){
                         is_valid = false;
                     }
                 }
@@ -202,7 +214,10 @@ void analyze_directory(const char *path)
                 *(new_path + strlen(new_path)) = '\0';
                 if (is_regular_file(new_path))
                 {
-                    analyze_file(new_path);
+                    /*controlla che il file non sia nella blacklist*/
+                    if(!is_in_blacklist(new_path, file_blacklist, file_blacklist_size)){
+                        analyze_file(new_path);
+                    }
                 }
                 if (is_directory(new_path) && recursive)
                 {
@@ -234,7 +249,6 @@ int main(int argc, char **argv)
 
     /*iniaizlizzazione trie*/
     trie_root = create_trieNode();
-    printf("creato\n");
     bool sorted = sort_by_occurency;
     
 
