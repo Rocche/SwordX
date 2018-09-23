@@ -5,143 +5,188 @@
 #include "sbolist.h"
 #include "trie.h"
 
-char int_to_charset(int n) {
-
-    char result;
-    if (n>=0 && n<CHAR_OFFSET){result=(n+BASE_DIGIT);}
-    else if (n>=CHAR_OFFSET && n<=CHARSET){ result=(n-CHAR_OFFSET+BASE_CHAR);}
-    else { perror("int_to_charset() input not valid\n"); exit(EXIT_FAILURE);}
-    return result;
-
-}
-
-int charset_to_int(char c) {
-
-    int result;
-    if (isdigit(c)){result=(c-BASE_DIGIT);}
-    else if (isalpha(c)) {result= (int)(tolower(c))-BASE_CHAR+CHAR_OFFSET;}
-    else { perror("charset_to_int() input not valid\n"); exit(EXIT_FAILURE);}
-    return result;
-
-}
-
-void allocate_trie_word( char* trie_word, int tw_len ){
-
-    if (tw_len>0) {
-        trie_word = realloc(trie_word, sizeof(char)*(tw_len+2));
-    } else {
-        trie_word = malloc(sizeof(char)*2);
+char int_to_charset(int n)
+{
+    if (n >= 0 && n < CHAR_OFFSET)
+    {
+        return (n + BASE_DIGIT);
     }
-    check_heap(trie_word);
-    trie_word[tw_len+2]='\0';
-
-}
-
-trieNode* create_trieNode () {
-
-    trieNode* t_node = malloc(sizeof(trieNode));
-    if (t_node == NULL) {
-        perror("Error: malloc failed for t_node\n");
+    else if (n >= CHAR_OFFSET && n <= CHARSET)
+    {
+        return (n - CHAR_OFFSET + BASE_CHAR);
+    }
+    else
+    {
+        perror("(char) int_to_charset (int): input not valid\n");
         exit(EXIT_FAILURE);
     }
+}
 
+int charset_to_int(char c)
+{
+    if (isdigit(c))
+    {
+        return (c - BASE_DIGIT);
+    }
+    else if (isalpha(c))
+    {
+        return (int)(tolower(c)) - BASE_CHAR + CHAR_OFFSET;
+    }
+    else
+    {
+        perror("(int) charset_to_int (char): input not valid\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+char *reallocate_trie_word(char *trie_word)
+{
+    {
+        trie_word = realloc(trie_word, sizeof(char) * (strlen(trie_word)+ 2));
+        trie_word[strlen(trie_word) + 1] = '\0';
+    }
+    check_heap(trie_word);
+    return trie_word;
+
+}
+
+trieNode *create_trieNode()
+{
+    trieNode *t_node = malloc(sizeof(trieNode));
+    check_heap(t_node);
     t_node->occurrencies = 0;
-    for (int i = 0; i <= CHARSET; i++) {
+    for (int i = 0; i <= CHARSET; i++)
+    {
         t_node->children[i] = NULL;
     }
-
     return t_node;
+}
 
+char* init_tw (){
+    char *trie_word = calloc(2, sizeof(char));
+    check_heap(trie_word);
+    trie_word[1]='\0';
+    return trie_word;
 }
 
 
-void add_word ( trieNode *node, char *str ) {
+void add_word (trieNode *root, char* str ){
+    
+    char *trie_word = init_tw();
+    printf("%d\n", (int)strlen(trie_word));
+    int str_index = 0;
+    trieNode* node = root;
 
-    static char* trie_word;
-    int tw_len = strlen(trie_word);
-    allocate_trie_word(trie_word,tw_len);
-    char c = str[tw_len];
-    trie_word[tw_len] = c;
-
-    if (node->children[charset_to_int(c)] != NULL) {
-        if (strlen(str) > tw_len) {
-            add_word(node->children[charset_to_int(c)],str);
-        } else if (strlen(str) == tw_len) {
-            node->children[charset_to_int(c)]->occurrencies++;
+    char c = str[str_index];
+    //printf("%c\n", c);
+    while(c != '\0'){
+        trie_word[str_index]=c;
+        printf("%s\n", trie_word);
+        //printf("%c\n", c);
+        if (node->children[charset_to_int(c)] != NULL) {
+            if (strlen(str) == strlen(trie_word)) {
+                node->children[charset_to_int(c)]->occurrencies++;
+                free(trie_word);
+                return;
+            }
+            else{
+                trie_word = reallocate_trie_word(trie_word);
+                printf("%s\n", trie_word);
+                node = node->children[charset_to_int(c)];
+                str_index++;
+                c = str[str_index];
+            }
+        } else {
+            node = add_nodes(node,str,str_index);
+            free(trie_word);
+            return;
         }
-    } else {
-        node = add_nodes(node,str,tw_len);
     }
-
+    free(trie_word);
 }
 
-trieNode* add_nodes ( trieNode* node, char* str, int index ) {
-
-    trieNode* new_node = create_trieNode(new_node);
+trieNode *add_nodes(trieNode *node, char *str, int index)
+{
+    trieNode *new_node = create_trieNode(new_node);
     node->children[charset_to_int(str[index])] = new_node;
     index++;
-    if (str[index] != '\0') {
-        node = add_nodes(new_node,str,index);
-    } else {
+    if (str[index] != '\0')
+    {
+        node = add_nodes(new_node, str, index);
+    }
+    else
+    {
         new_node->occurrencies++;
     }
     return node;
 }
 
-void print_trie( FILE *file, trieNode *node ) {
+void print_trie(FILE *file, trieNode *node)
+{
+    static bool init;
+    static char *trie_word;
 
-    static char* trie_word;
-    int tw_len = strlen(trie_word);
-    allocate_trie_word(trie_word,tw_len);
+    if (!init){
+        trie_word = init_tw(trie_word);
+        init = true;
+    } else {
+        trie_word = reallocate_trie_word(trie_word);
+    }
+    
 
-    for ( int i=0 ; i<=CHARSET ; i++ ) {
-        if ( node->children[i] != NULL ) {
-            trie_word[tw_len] = int_to_charset(i);
-            if ( node->children[i]->occurrencies != 0 ) {
-                trie_word[tw_len+1]='\0';
+    for (int i = 0; i <= CHARSET; i++)
+    {
+        if (node->children[i] != NULL)
+        {
+            trie_word[strlen(trie_word)] = int_to_charset(i);
+            if (node->children[i]->occurrencies > 0)
+            {
+                trie_word[strlen(trie_word) + 1] = '\0';
                 fprintf(file, "%s: %i\n", trie_word, node->children[i]->occurrencies);
             }
             print_trie(file, node->children[i]);
         }
     }
+    trie_word[strlen(trie_word) - 1] = '\0';
+    printf("%s\n", trie_word);
 }
 
-occurrencyNode** sort_trie_by_occurrencies ( trieNode* t_node ) {
+void sort_trie_by_occurrencies(trieNode *t_node, occurrencyNode **sl_root)
+{
+    static char *trie_word;
+    trie_word = reallocate_trie_word(trie_word);
 
-    static char* trie_word;
-    int tw_len = strlen(trie_word);
-    allocate_trie_word(trie_word,tw_len);
-
-    occurrencyNode** sl_root = malloc(sizeof(occurrencyNode*));
-    check_heap(sl_root);
-    
-    for ( int i=CHARSET ; i>=0 ; i-- ) {
-        if ( t_node->children[i] != NULL) {
-            trie_word[tw_len] = int_to_charset(i);
-            sl_root = sort_trie_by_occurrencies( t_node->children[i]);
+    for (int i = CHARSET; i >= 0; i--)
+    {
+        if (t_node->children[i] != NULL)
+        {
+            trie_word[strlen(trie_word)] = int_to_charset(i);
+            sort_trie_by_occurrencies(t_node->children[i], sl_root);
         }
-        if ( t_node->occurrencies != 0 ) {
-            sl_root = add_to_sbolist(sl_root,trie_word, t_node->occurrencies);
+        if (t_node->occurrencies > 0)
+        {
+            trie_word[strlen(trie_word) + 1] = '\0';
+            add_to_sbolist(sl_root, trie_word, t_node->occurrencies);
         }
     }
-    return sl_root;
 }
 
-
-occurrencyNode** add_to_sbolist (occurrencyNode** sl_root, char* word, int occurrencies) {
-
-    occurrencyNode* oc_node;
-    for ( int i=0 ; i<=sizeof(sl_root) ; i+sizeof(occurrencyNode*)){
+void add_to_sbolist(occurrencyNode **sl_root, char *word, int occurrencies)
+{
+    occurrencyNode *oc_node;
+    for (int i = 0; i <= sizeof(sl_root); i += sizeof(occurrencyNode *))
+    {
         oc_node = sl_root[i];
-        if ( oc_node->occurrency == occurrencies) {
-            sortedNode* sl_node = create_sortedNode(word);
+        if (oc_node->occurrency == occurrencies)
+        {
+            sortedNode *sl_node = create_sortedNode(word);
             sl_node->next = oc_node->first;
-            oc_node->first = sl_node;     
+            oc_node->first = sl_node;
+            return;
         }
     }
     oc_node = create_occurrencyNode(occurrencies);
-    sl_root = realloc(sl_root, sizeof(sl_root)+sizeof(occurrencyNode*));
+    sl_root[sizeof(sl_root) - sizeof(occurrencyNode *)] = oc_node;
+    sl_root = realloc(sl_root, sizeof(sl_root) + sizeof(occurrencyNode *));
     check_heap(sl_root);
-    sl_root[sizeof(sl_root)] = oc_node;
-    return sl_root;
 }

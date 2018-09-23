@@ -20,7 +20,6 @@ char *init_current_string()
 //metodo che aggiunge un carattere alla stringa di riferimento
 void add_char_to_str(char c, char *str)
 {
-    //printf("%lu\n", strlen(str));
     int new_length = strlen(str) + sizeof(char) * 2;
     str = (char *)realloc(str, new_length);
     check_heap(str);
