@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 #include "file_operations.h"
-#include "heap.h"
+#include "utils.h"
 
 //metodo che inizializza l'allocazione di memoria della stringa da far elaborare
 //al trie. La dimensione è 1 carattere + carattere terminazione '\0'
@@ -59,4 +59,36 @@ bool is_symbolic_link(const char *path)
         return false;
     }
     return S_ISLNK(buf.st_mode) ? true : false;
+}
+
+
+bool is_alphanumerical_string(char* word){
+    for (int i = 0; i < strlen(word); i++)
+    {
+        if (!isalpha(*(word + i)) && !isdigit(*(word + i)))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool is_alphabetical_string(char* word){
+    for (int i = 0; i < strlen(word); i++)
+    {
+        if (!isalpha(*(word + i)))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool is_in_blacklist(char* word, char** blacklist, size_t blacklist_size){
+    for(int i = 0; i < blacklist_size; i++){
+        if(strcmp(word, *(blacklist + i)) == 0){
+            return true;
+        }
+    }
+    return false;
 }

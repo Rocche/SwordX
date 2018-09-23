@@ -10,7 +10,7 @@
 #include <argz.h>
 #include <dirent.h>
 #include "file_operations.h"
-#include "heap.h"
+#include "utils.h"
 
 //inizializzazione opzioni
 bool recursive = false;
@@ -18,9 +18,21 @@ bool follow = false;
 bool exclude = false;
 bool alpha = false;
 int min = 0;
-bool ignore = false;
 bool sort_by_occurency = false;
 bool log_flag = false;
+
+/*word blacklist (--ignore)*/
+char** word_blacklist = NULL;
+size_t word_blacklist_size = 0;
+
+/*file blacklist (--exclude)*/
+char** file_blacklist = NULL;
+size_t file_blacklist_size = 0;
+
+/*root trie*/
+trieNode* trie_root = NULL;
+/*output*/
+FILE* dest_fp;
 
 /*inizializza automaticamente l'opzione --version*/
 const char *argp_program_version = "version 1.0";
@@ -30,6 +42,45 @@ struct arguments
     char *argz;
     size_t argz_len;
 };
+
+/*crea la blacklist di parole da ignorare contenute in un file*/
+
+char** update_word_blacklist(const char* path){
+
+    FILE* fp = fopen(path, "r");
+    if(fp == NULL){
+        perror("Could not open the ignore file");
+        exit(EXIT_FAILURE);
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+
+    while (getline(&line, &len, fp) != -1)
+    {
+        if (*(line + strlen(line) - 1) == '\n'){
+            *(line + strlen(line) - 1) = '\0';
+        }
+
+        word_blacklist = (char**)realloc(word_blacklist, (word_blacklist_size + 1)*sizeof(char*));
+        check_heap(word_blacklist);
+        *(word_blacklist + word_blacklist_size) = (char*)malloc(strlen(line));
+        check_heap(*(word_blacklist + word_blacklist_size));
+        strcpy(*(word_blacklist + word_blacklist_size), line);
+        word_blacklist_size++;
+    }
+    fclose(fp);
+}
+
+char** update_file_blacklist(const char* file){
+    file_blacklist = (char**)realloc(file_blacklist, (file_blacklist_size + 1)*sizeof(char*));
+    check_heap(file_blacklist);
+    *(file_blacklist + file_blacklist_size) = (char*)malloc(strlen(file));
+    check_heap(*(file_blacklist + file_blacklist_size));
+    strcpy(*(file_blacklist + file_blacklist_size), file);
+    file_blacklist_size++;
+}
+
 /*Azioni in base al tipo di opzione*/
 static int parse_opt(int key, char *arg, struct argp_state *state)
 {
@@ -40,7 +91,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         recursive = true;
         break;
     case 'e':
-        exclude = true;
+        update_file_blacklist(arg);
         break;
     case 'f':
         follow = true;
@@ -52,7 +103,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         min = atoi(arg);
         break;
     case 'i':
-        ignore = true;
+        update_word_blacklist(arg);
         break;
     case 's':
         sort_by_occurency = true;
@@ -107,24 +158,14 @@ void analyze_file(const char *path)
             {
                 if (alpha)
                 {
-                    for (int i = 0; i < strlen(word); i++)
-                    {
-                        if (!isalpha(*(word + i)))
-                        {
-                            is_valid = false;
-                            break;
-                        }
+                    if(!is_alphabetical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size)){
+                        is_valid = false;
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < strlen(word); i++)
-                    {
-                        if (!isalpha(*(word + i)) && !isdigit(*(word + i)))
-                        {
-                            is_valid = false;
-                            break;
-                        }
+                    if(!is_alphanumerical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size)){
+                        is_valid = false;
                     }
                 }
             }
@@ -134,6 +175,7 @@ void analyze_file(const char *path)
 
             if(is_valid){
                 printf("%s\n", word);
+                //add_word(trie_root, word);
             }
 
             word = strtok_r(NULL, " ", &save);
@@ -172,7 +214,10 @@ void analyze_directory(const char *path)
                 *(new_path + strlen(new_path)) = '\0';
                 if (is_regular_file(new_path))
                 {
-                    analyze_file(new_path);
+                    /*controlla che il file non sia nella blacklist*/
+                    if(!is_in_blacklist(new_path, file_blacklist, file_blacklist_size)){
+                        analyze_file(new_path);
+                    }
                 }
                 if (is_directory(new_path) && recursive)
                 {
@@ -184,8 +229,60 @@ void analyze_directory(const char *path)
     }
 }
 
+int main(int argc, char **argv)
+{
+    /*contiene la descrizione delle opzioni*/
+    struct argp_option options[] = {
+        {"recursive", 'r', 0, 0, "Check for subdirectories too"},
+        {"exclude", 'e', "<file>", 0, "The specified file won't be considered"},
+        {"follow", 'f', 0, 0, "Follow links too"},
+        {"alpha", 'a', 0, 0, "Consider only words composed by alphabetical characters"},
+        {"min", 'm', "<num>", 0, "Consider only words with at least <num> characters"},
+        {"ignore", 'i', "<file>", 0, "Ignore words contained in <file> (a row is considered as a word)"},
+        {"sortbyoccurrency", 's', 0, 0, "The analysis sorts words by occurency"},
+        {"log", 'l', "<file>", 0, "At the end create a log file containing stats foreach file processed"},
+        {0}};
 
-int main(void)
+    struct arguments arguments;
+    //contiene le opzioni, callback function e descrittore in usage
+    struct argp argp = {options, parse_opt, "<input1> <input2> ... <inputn>", "Count words occurencies in specified files or directories and save the reuslt in a .txt file"};
+
+    /*iniaizlizzazione trie*/
+    trie_root = create_trieNode();
+    bool sorted = sort_by_occurency;
+    
+
+    if (argp_parse(&argp, argc, argv, 0, 0, &arguments) == 0)
+    {
+        /*salva l'argomento precedente*/
+        const char *previous = NULL;
+        char *argument;
+        /*controlla gli argomenti uno per uno*/
+        while ((argument = argz_next(arguments.argz, arguments.argz_len, previous)))
+        {
+            previous = argument;
+
+            /*si controlla il tipo del file*/
+            if(is_symbolic_link(argument)){
+                if(follow){
+                    analyze_file(argument);
+                }
+                else{
+                    printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow", argument);
+                }
+            }
+            else if(is_regular_file(argument)){
+                analyze_file(argument);
+            }
+            else if(is_directory(argument)){
+                analyze_directory(argument);
+            }
+        }
+        printf("\n");
+        free(arguments.argz);
+    }
+    
+  int main(void)
 {
     trieNode *trie_root = create_trieNode();
     bool sorted = false;
@@ -204,6 +301,5 @@ int main(void)
         print_sorted_list(dest_fp, sl_root);
     }
     fclose(dest_fp);
-    
     return 0;
 }

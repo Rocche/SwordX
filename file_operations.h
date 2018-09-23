@@ -20,4 +20,9 @@ bool is_directory(const char*);
 //controlla se la stringa è un symbolic link
 bool is_symbolic_link(const char*);
 
+bool is_alphanumerical_string(char*);
+
+bool is_alphabetical_string(char*);
+
+bool is_in_blacklist(char*, char**, size_t);
 #endif //FILE_OPERATIONS_H
