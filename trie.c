@@ -7,40 +7,36 @@
 
 char int_to_charset(int n)
 {
-    char result;
     if (n >= 0 && n < CHAR_OFFSET)
     {
-        result = (n + BASE_DIGIT);
+        return (n + BASE_DIGIT);
     }
     else if (n >= CHAR_OFFSET && n <= CHARSET)
     {
-        result = (n - CHAR_OFFSET + BASE_CHAR);
+        return (n - CHAR_OFFSET + BASE_CHAR);
     }
     else
     {
         perror("(char) int_to_charset (int): input not valid\n");
         exit(EXIT_FAILURE);
     }
-    return result;
 }
 
 int charset_to_int(char c)
 {
-    int result;
     if (isdigit(c))
     {
-        result = (c - BASE_DIGIT);
+        return (c - BASE_DIGIT);
     }
     else if (isalpha(c))
     {
-        result = (int)(tolower(c)) - BASE_CHAR + CHAR_OFFSET;
+        return (int)(tolower(c)) - BASE_CHAR + CHAR_OFFSET;
     }
     else
     {
         perror("(int) charset_to_int (char): input not valid\n");
         exit(EXIT_FAILURE);
     }
-    return result;
 }
 
 void allocate_trie_word(char *trie_word, int tw_len)
@@ -130,10 +126,10 @@ void print_trie(FILE *file, trieNode *node)
             print_trie(file, node->children[i]);
         }
     }
-    trie_word[tw_len]='\0';
+    trie_word[tw_len] = '\0';
 }
 
-void sort_trie_by_occurrencies(trieNode *t_node,occurrencyNode **sl_root)
+void sort_trie_by_occurrencies(trieNode *t_node, occurrencyNode **sl_root)
 {
     static char *trie_word;
     int tw_len = strlen(trie_word);
@@ -144,11 +140,11 @@ void sort_trie_by_occurrencies(trieNode *t_node,occurrencyNode **sl_root)
         if (t_node->children[i] != NULL)
         {
             trie_word[tw_len] = int_to_charset(i);
-            sort_trie_by_occurrencies(t_node->children[i],sl_root);
+            sort_trie_by_occurrencies(t_node->children[i], sl_root);
         }
         if (t_node->occurrencies > 0)
         {
-            trie_word[tw_len+1] = '\0';
+            trie_word[tw_len + 1] = '\0';
             add_to_sbolist(sl_root, trie_word, t_node->occurrencies);
         }
     }
@@ -169,7 +165,7 @@ void add_to_sbolist(occurrencyNode **sl_root, char *word, int occurrencies)
         }
     }
     oc_node = create_occurrencyNode(occurrencies);
-    sl_root[sizeof(sl_root)-sizeof(occurrencyNode*)] = oc_node;
+    sl_root[sizeof(sl_root) - sizeof(occurrencyNode *)] = oc_node;
     sl_root = realloc(sl_root, sizeof(sl_root) + sizeof(occurrencyNode *));
     check_heap(sl_root);
 }

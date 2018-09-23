@@ -204,5 +204,6 @@ int main(void)
         print_sorted_list(dest_fp, sl_root);
     }
     fclose(dest_fp);
+    
     return 0;
 }
