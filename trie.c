@@ -74,7 +74,10 @@ void add_word(trieNode *node, char *str)
     char c = str[strlen(trie_word)];
 
     trie_word[strlen(trie_word)] = c;
-
+    printf("%c\n", c);
+    printf("%s\n", trie_word);
+    printf("%d\n", (int)strlen(trie_word));
+    
     if (node->children[charset_to_int(c)] != NULL)
     {
         if (strlen(str) > strlen(trie_word))

@@ -179,7 +179,7 @@ void analyze_file(const char *path, trieNode* trie_node)
             }
 
             if(is_valid){
-                printf("%s\n", word);
+                //printf("%s\n", word);
                 add_word(trie_node, word);
             }
 
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 
         trie_root = create_trieNode();
 
-        printf("ciao\n");
+        //printf("ciao\n");
         /*controlla gli argomenti uno per uno*/
         while ((argument = argz_next(arguments.argz, arguments.argz_len, previous)))
         {
