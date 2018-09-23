@@ -12,6 +12,5 @@ static const char BASE_CHAR = 'a';
 static const int CHAR_OFFSET = 10;
 
 void check_heap(void*);
-void clear_str(char*);
 
 #endif // UTILS_H_INCLUDED

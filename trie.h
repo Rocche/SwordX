@@ -14,7 +14,8 @@ typedef struct trieNode {
 
 char int_to_charset(int);
 int charset_to_int(char);
-char* allocate_trie_word(char *);
+char* reallocate_trie_word(char *);
+char* init_tw();
 
 trieNode *create_trieNode();
 void add_word(trieNode *, char *);

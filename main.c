@@ -179,8 +179,8 @@ void analyze_file(const char *path, trieNode* trie_node)
             }
 
             if(is_valid){
-                //printf("%s\n", word);
-                add_word(trie_node, word);
+                printf("%s\n", word);
+                add_word(trie_root, word);
             }
 
             word = strtok_r(NULL, " ", &save);
