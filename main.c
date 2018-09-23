@@ -34,7 +34,7 @@ size_t file_blacklist_size = 0;
 /*root trie*/
 trieNode* trie_root = NULL;
 /*output*/
-FILE* dest_fp;
+FILE* dest_fp = NULL;
 
 /*inizializza automaticamente l'opzione --version*/
 const char *argp_program_version = "version 1.0";
@@ -110,6 +110,9 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
     case 's':
         sort_by_occurency = true;
         break;
+    case 'o':
+        //dest_fp = arg;
+        break;
     case 'l':
         log_flag = true;
         break;
@@ -132,7 +135,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
 
 
 //metodo che elabora le stringhe di un file
-void analyze_file(const char *path)
+void analyze_file(const char *path, trieNode* trie_node)
 {
     FILE *fptr = fopen(path, "r");
     if (fptr == NULL)
@@ -177,7 +180,7 @@ void analyze_file(const char *path)
 
             if(is_valid){
                 printf("%s\n", word);
-                //add_word(trie_root, word);
+                add_word(trie_node, word);
             }
 
             word = strtok_r(NULL, " ", &save);
@@ -189,7 +192,7 @@ void analyze_file(const char *path)
 
 
 //metodo che elabora i file regolari in una directory
-void analyze_directory(const char *path)
+void analyze_directory(const char *path, trieNode* trie_node)
 {
     DIR *dir;
     struct dirent *ent;
@@ -218,12 +221,12 @@ void analyze_directory(const char *path)
                 {
                     /*controlla che il file non sia nella blacklist*/
                     if(!is_in_blacklist(new_path, file_blacklist, file_blacklist_size)){
-                        analyze_file(new_path);
+                        analyze_file(new_path, trie_node);
                     }
                 }
                 if (is_directory(new_path) && recursive)
                 {
-                    analyze_directory(new_path);
+                    analyze_directory(new_path, trie_node);
                 }
                 free(new_path);
             }
@@ -242,6 +245,7 @@ int main(int argc, char **argv)
         {"min", 'm', "<num>", 0, "Consider only words with at least <num> characters"},
         {"ignore", 'i', "<file>", 0, "Ignore words contained in <file> (a row is considered as a word)"},
         {"sortbyoccurrency", 's', 0, 0, "The analysis sorts words by occurency"},
+        {"output", 'o', "<file>", 0, "Specify the output file (if not set, it will be automatically \"output.txt\""},
         {"log", 'l', "<file>", 0, "At the end create a log file containing stats foreach file processed"},
         {0}};
 
@@ -249,9 +253,6 @@ int main(int argc, char **argv)
     //contiene le opzioni, callback function e descrittore in usage
     struct argp argp = {options, parse_opt, "<input1> <input2> ... <inputn>", "Count words occurencies in specified files or directories and save the reuslt in a .txt file"};
 
-    /*iniaizlizzazione trie*/
-    trie_root = create_trieNode();
-    bool sorted = sort_by_occurency;
     
 
     if (argp_parse(&argp, argc, argv, 0, 0, &arguments) == 0)
@@ -259,6 +260,11 @@ int main(int argc, char **argv)
         /*salva l'argomento precedente*/
         const char *previous = NULL;
         char *argument;
+
+
+        trie_root = create_trieNode();
+
+        printf("ciao\n");
         /*controlla gli argomenti uno per uno*/
         while ((argument = argz_next(arguments.argz, arguments.argz_len, previous)))
         {
@@ -267,30 +273,29 @@ int main(int argc, char **argv)
             /*si controlla il tipo del file*/
             if(is_symbolic_link(argument)){
                 if(follow){
-                    analyze_file(argument);
+                    analyze_file(argument, trie_root);
                 }
                 else{
                     printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow", argument);
                 }
             }
             else if(is_regular_file(argument)){
-                analyze_file(argument);
+                analyze_file(argument, trie_root);
             }
             else if(is_directory(argument)){
-                analyze_directory(argument);
+                analyze_directory(argument, trie_root);
             }
         }
         printf("\n");
         free(arguments.argz);
     }
 
-    //              codice ale
-    
-    trieNode *trie_root = create_trieNode();
-    bool sorted = false;
-    FILE *dest_fp;
-
-    if (sorted == false)
+    dest_fp = fopen("output.txt", "w");
+    if(dest_fp == NULL){
+        perror("Cannot open file");
+        exit(EXIT_FAILURE);
+    }
+    if (!sort_by_occurency)
     {
         print_trie(dest_fp, trie_root);
     }
