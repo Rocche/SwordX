@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//  stuctures
-
 typedef struct occurrencyNode {
     int occurrency;
     struct sortedNode *first;
@@ -16,7 +14,6 @@ typedef struct sortedNode {
     struct sortedNode *next;
 } sortedNode;
 
-//  sorted list management functions
 
 occurrencyNode *create_occurrencyNode(int occurrency);
 sortedNode *create_sortedNode(char *);

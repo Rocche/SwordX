@@ -2,15 +2,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "trie.h"
-#include "sbolist.h"
 #include <stdbool.h>
 /*argp guide: http://nongnu.askapache.com/argpbook/step-by-step-into-argp.pdf */
 #include <argp.h>
 #include <argz.h>
 #include <dirent.h>
+
 #include "file_operations.h"
 #include "heap.h"
+
+#include "trie.h"
+#include "sbolist.h"
 
 //inizializzazione opzioni
 bool recursive = false;

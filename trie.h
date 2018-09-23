@@ -11,11 +11,10 @@ typedef struct trieNode {
     struct trieNode *children[CHARSET];
 } trieNode;
 
-//  trie management functions
 
 char int_to_charset(int);
 int charset_to_int(char);
-void allocate_trie_word(char *, int);
+char* allocate_trie_word(char *);
 
 trieNode *create_trieNode();
 void add_word(trieNode *, char *);
