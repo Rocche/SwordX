@@ -285,22 +285,25 @@ int main(int argc, char **argv)
         printf("\n");
         free(arguments.argz);
     }
-    /*
-    dest_fp = fopen("output.txt", "w");
-    if(dest_fp == NULL){
-        perror("can't open dir");
-        exit(EXIT_FAILURE);
+    
+  int main(void)
+{
+    trieNode *trie_root = create_trieNode();
+    bool sorted = false;
+    FILE *dest_fp;
+
+    if (sorted == false)
+    {
+        print_trie(dest_fp, trie_root);
     }
-    if (sorted==false) {
-        print_trie( dest_fp, trie_root); 
-    } else {
-        occurrencyNode** sl_root; // sorted list occurrencyNodes pointer
-        sl_root = sort_trie_by_occurrencies(trie_root);
-        qsort (sl_root, sizeof(sl_root)/sizeof(occurrencyNode*),sizeof(occurrencyNode*),compare_occurrencyNodes);
+    else
+    {
+        occurrencyNode **sl_root = malloc(sizeof(occurrencyNode *));
+        check_heap(sl_root);
+        sort_trie_by_occurrencies(trie_root,sl_root);
+        qsort(sl_root, sizeof(sl_root) / sizeof(occurrencyNode *), sizeof(occurrencyNode *), compare_occurrencyNodes);
         print_sorted_list(dest_fp, sl_root);
     }
-
     fclose(dest_fp);
-    */
     return 0;
 }
