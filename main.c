@@ -177,7 +177,7 @@ void analyze_file(const char *path)
 
             if(is_valid){
                 printf("%s\n", word);
-                //add_word(trie_root, word);
+                add_word(trie_root, word);
             }
 
             word = strtok_r(NULL, " ", &save);
@@ -285,7 +285,7 @@ int main(int argc, char **argv)
     }
 
     //              codice ale
-    
+
     trieNode *trie_root = create_trieNode();
     bool sorted = false;
     FILE *dest_fp;

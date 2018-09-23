@@ -1,0 +1,7 @@
+void print_trie(FILE* file, trieNode *node){
+    
+    char* trie_word = init_tw();
+    int str_index = 0;
+    
+    
+}

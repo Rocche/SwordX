@@ -39,20 +39,15 @@ int charset_to_int(char c)
     }
 }
 
-char* allocate_trie_word(char *trie_word)
+char *reallocate_trie_word(char *trie_word)
 {
-    if (trie_word!=NULL)
     {
         trie_word = realloc(trie_word, sizeof(char) * (strlen(trie_word)+ 2));
-        trie_word[strlen(trie_word) + 2] = '\0';
-    }
-    else
-    {
-        trie_word = malloc(sizeof(char) * 2);
-        trie_word[1] = '\0';
+        trie_word[strlen(trie_word) + 1] = '\0';
     }
     check_heap(trie_word);
     return trie_word;
+
 }
 
 trieNode *create_trieNode()
@@ -67,29 +62,36 @@ trieNode *create_trieNode()
     return t_node;
 }
 
-void add_word(trieNode *node, char *str)
-{
-    static char *trie_word;
-    trie_word = allocate_trie_word(trie_word);
-    char c = str[strlen(trie_word)];
+char* init_tw (){
+    char *trie_word = malloc(sizeof(char)*2);
+    check_heap(trie_word);
+    trie_word[1]='\0';
+    return trie_word;
+}
 
-    trie_word[strlen(trie_word)] = c;
+void add_word (trieNode *root, char* str ){
+    
+    char *trie_word = init_tw();
+    int str_index = 0;
+    trieNode* node = root;
 
-    if (node->children[charset_to_int(c)] != NULL)
-    {
-        if (strlen(str) > strlen(trie_word))
-        {
-            add_word(node->children[charset_to_int(c)], str);
+    char c = str[str_index];
+    while(c != '\0'){
+        trie_word[str_index]=c;
+        if (node->children[charset_to_int(c)] != NULL) {
+            if (strlen(str) == strlen(trie_word)) {
+                node->children[charset_to_int(c)]->occurrencies++;
+                free(trie_word);
+                return;
+            }
+        } else {
+            node = add_nodes(node,str,strlen(trie_word));
         }
-        else if (strlen(str) == strlen(trie_word))
-        {
-            node->children[charset_to_int(c)]->occurrencies++;
-        }
+        c = str[++str_index];
+
+        node = node->children[charset_to_int(c)];
     }
-    else
-    {
-        node = add_nodes(node, str, strlen(trie_word));
-    }
+    free(trie_word);
 }
 
 trieNode *add_nodes(trieNode *node, char *str, int index)
@@ -110,8 +112,16 @@ trieNode *add_nodes(trieNode *node, char *str, int index)
 
 void print_trie(FILE *file, trieNode *node)
 {
+    static bool init;
     static char *trie_word;
-    trie_word = allocate_trie_word(trie_word);
+
+    if (!init){
+        trie_word = init_tw(trie_word);
+        init = true;
+    } else {
+        trie_word = reallocate_trie_word(trie_word);
+    }
+    
 
     for (int i = 0; i <= CHARSET; i++)
     {
@@ -132,7 +142,7 @@ void print_trie(FILE *file, trieNode *node)
 void sort_trie_by_occurrencies(trieNode *t_node, occurrencyNode **sl_root)
 {
     static char *trie_word;
-    trie_word = allocate_trie_word(trie_word);
+    trie_word = reallocate_trie_word(trie_word);
 
     for (int i = CHARSET; i >= 0; i--)
     {
