@@ -1,13 +1,11 @@
-Alberello
-    Felice banana
-        Che corre
-            Nella neve
-Della mattina
-    Gelida
-        e Fredda
-            Ma non si abbatte
-                L'alberello corre
-            Felice
-        Sono loro
-    I taglialegna
-        Ad abbatterlo.
+076
+12
+076
+alberello
+albatros
+albero
+albatros
+albatros
+banana
+zattera
+zuzzurellone
