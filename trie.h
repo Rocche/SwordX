@@ -22,7 +22,7 @@
     trieNode* add_nodes(trieNode*, char*,int);
     void print_trie(FILE*, trieNode*);
     
-    occurrencyNode** sort_trie_by_occurrencies(trieNode*);
-    occurrencyNode** add_to_sbolist(occurrencyNode**,char*,int);
+    void sort_trie_by_occurrencies(trieNode*,occurrencyNode**);
+    void add_to_sbolist(occurrencyNode**,char*,int);
 
 #endif // TRIE_H_INCLUDED
