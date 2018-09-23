@@ -32,7 +32,7 @@ size_t file_blacklist_size = 0;
 /*root trie*/
 trieNode* trie_root = NULL;
 /*output*/
-FILE* dest_fp;
+FILE* dest_fp = NULL;
 
 /*inizializza automaticamente l'opzione --version*/
 const char *argp_program_version = "version 1.0";
@@ -107,6 +107,9 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         break;
     case 's':
         sort_by_occurency = true;
+        break;
+    case 'o':
+        //dest_fp = arg;
         break;
     case 'l':
         log_flag = true;
@@ -240,6 +243,7 @@ int main(int argc, char **argv)
         {"min", 'm', "<num>", 0, "Consider only words with at least <num> characters"},
         {"ignore", 'i', "<file>", 0, "Ignore words contained in <file> (a row is considered as a word)"},
         {"sortbyoccurrency", 's', 0, 0, "The analysis sorts words by occurency"},
+        {"output", 'o', "<file>", 0, "Specify the output file (if not set, it will be automatically \"output.txt\""},
         {"log", 'l', "<file>", 0, "At the end create a log file containing stats foreach file processed"},
         {0}};
 
