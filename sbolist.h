@@ -6,7 +6,7 @@
 
 typedef struct sl_root {
     int elements;
-    struct occurrencyNode* oc_nodes;
+    struct occurrencyNode *oc_nodes;
 } sl_root;
 
 typedef struct occurrencyNode {
@@ -23,6 +23,6 @@ sl_root *create_sl_root(void);
 occurrencyNode *create_occurrencyNode(int occurrency);
 sortedNode *create_sortedNode(char *);
 int compare_occurrencyNodes(const void *, const void *);
-void print_sorted_list(FILE *, occurrencyNode **);
+void print_sorted_list(FILE *, sl_root*);
 
 #endif // SORTED_LIST_H_INCLUDED

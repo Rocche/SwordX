@@ -35,16 +35,14 @@ int compare_occurrencyNodes(const void *node1, const void *node2)
            ((occurrencyNode *)node2)->occurrency;
 }
 
-void print_sorted_list(FILE *dest_fp, occurrencyNode **sl_root)
+void print_sorted_list(FILE *dest_fp, sl_root *sl_root)
 {
-    int index = 0;
-    occurrencyNode *oc_node = (*sl_root + index);
-    while (oc_node != NULL)
-    {
-        sortedNode *sl_node = oc_node->first;
+    for ( int i=0; i<sl_root->elements ; i++ ){
+        occurrencyNode oc_node = (sl_root->oc_nodes[i]);        
+        sortedNode *sl_node = oc_node.first;
         while (sl_node != NULL)
         {
-            fprintf(dest_fp, "%s: %i\n", sl_node->word, oc_node->occurrency);
+            fprintf(dest_fp, "\t %i %s\n", oc_node.occurrency, sl_node->word);
             sl_node = sl_node->next;
         }
     }

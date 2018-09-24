@@ -301,7 +301,6 @@ int main(int argc, char **argv)
 
         trie_root = create_trieNode();
 
-        //printf("ciao\n");
         /*controlla gli argomenti uno per uno*/
         while ((argument = argz_next(arguments.argz, arguments.argz_len, previous)))
         {
@@ -339,11 +338,9 @@ int main(int argc, char **argv)
     else
     {
         sl_root* sl_root = create_sl_root();
-        sort_trie_by_occurrencies(trie_root,sl_root);
-        qsort(sl_root, sizeof(sl_root) / sizeof(occurrencyNode *), sizeof(occurrencyNode *), compare_occurrencyNodes);
-                                                                                                                                printf("PORCAMADONNA\n\n");
-
-        // print_sorted_list(dest_fp, sl_root);
+        sl_root = sort_trie_by_occurrencies(trie_root,sl_root);
+        qsort(sl_root->oc_nodes, sl_root->elements, sizeof(occurrencyNode), compare_occurrencyNodes);
+        print_sorted_list(dest_fp, sl_root);
     }
     fclose(dest_fp);
 

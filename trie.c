@@ -158,6 +158,7 @@ sl_root *sort_trie_by_occurrencies(trieNode *t_node, sl_root *sl_root)
     static bool init;
     static char *trie_word;
 
+    // reallocazione della trie_word
     if (!init)
     {
         trie_word = init_tw(trie_word);
@@ -168,6 +169,7 @@ sl_root *sort_trie_by_occurrencies(trieNode *t_node, sl_root *sl_root)
         trie_word = reallocate_trie_word(trie_word);
     }
 
+    // ricorsione per vista trie
     for (int i = CHARSET; i >= 0; i--)
     {
         if (t_node->children[i] != NULL)
@@ -177,31 +179,34 @@ sl_root *sort_trie_by_occurrencies(trieNode *t_node, sl_root *sl_root)
         }
     }
 
+    // aggiunta della parola alla sorted list (se ha almeno una occorrenza)
     if (t_node->occurrencies > 0)
     {
         trie_word[strlen(trie_word) + 1] = '\0';
         sl_root = add_to_sbolist(sl_root, trie_word, t_node->occurrencies);
+
     }
+    // cancellazione ultimo carattere della trie_word
     trie_word[strlen(trie_word) - 1] = '\0';
+
     return sl_root;
 }
 
 sl_root *add_to_sbolist(sl_root *sl_root, char *word, int occurrencies)
 {
-    sortedNode* sl_node = create_sortedNode(word);
-
-    
-    occurrencyNode oc_node;
-                                                                                        printf("word: %s\n",word);
-    for ( int i=0; i<sl_root->elements;i++){
+    char* str = malloc(strlen(word)+1);
+    strcpy(str,word);
+    sortedNode* sl_node = create_sortedNode(str);
+    for ( int i=0; i<sl_root->elements ; i++){
         occurrencyNode oc_node = (sl_root->oc_nodes[i]);
         if (oc_node.occurrency == occurrencies){
             sl_node->next = oc_node.first;
             oc_node.first = sl_node;
-                                                                                        printf("aggiunta PORCODDIO\n\n");
+            sl_root->oc_nodes[i] = oc_node;
             return sl_root;
         }
     }
+
     occurrencyNode* p_oc_node = create_occurrencyNode(occurrencies);
     p_oc_node->first = sl_node;
 
@@ -209,6 +214,5 @@ sl_root *add_to_sbolist(sl_root *sl_root, char *word, int occurrencies)
     sl_root->oc_nodes = realloc (sl_root->oc_nodes, sizeof(occurrencyNode)*(sl_root->elements));
     check_heap(sl_root);
     sl_root->oc_nodes[sl_root->elements-1] = *p_oc_node;
-                                                                                        printf("nuovo nodo PORCODDIO\n\n");
     return sl_root;
 }
