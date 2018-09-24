@@ -2,7 +2,6 @@
 #define UTILS_H_INCLUDED
 
 #include <ctype.h>
-#include "stddef.h"
 
 /*https://it.wikipedia.org/wiki/Caratteri_alfanumerici*/
 #define CHARSET 35 //   10 digits + 26 characters

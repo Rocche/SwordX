@@ -6,6 +6,13 @@
 #include "utils.h"
 #include "sbolist.h"
 
+#define CHARSET 35 //   10 digits + 26 characters
+
+static const int LOWERCASE_OFFSET = 'a' - 'A';
+static const char BASE_DIGIT = '0';
+static const char BASE_CHAR = 'a';
+static const int CHAR_OFFSET = 10;
+
 typedef struct trieNode{
     int occurrencies;
     struct trieNode *children[CHARSET];
