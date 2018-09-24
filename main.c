@@ -186,6 +186,7 @@ void analyze_file(const char *path, trieNode* trie_node)
             word = strtok_r(NULL, " ", &save);
         }
     }
+
     fclose(fptr);
     printf("\n\n");
 }
@@ -301,11 +302,12 @@ int main(int argc, char **argv)
     }
     else
     {
-        occurrencyNode **sl_root = malloc(sizeof(occurrencyNode *));
-        check_heap(sl_root);
+        sl_root* sl_root = create_sl_root();
         sort_trie_by_occurrencies(trie_root,sl_root);
         qsort(sl_root, sizeof(sl_root) / sizeof(occurrencyNode *), sizeof(occurrencyNode *), compare_occurrencyNodes);
-        print_sorted_list(dest_fp, sl_root);
+                                                                                                                                printf("PORCAMADONNA\n\n");
+
+        // print_sorted_list(dest_fp, sl_root);
     }
     fclose(dest_fp);
     return 0;

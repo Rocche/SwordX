@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef struct sl_root {
+    int elements;
+    struct occurrencyNode* oc_nodes;
+} sl_root;
+
 typedef struct occurrencyNode {
     int occurrency;
     struct sortedNode *first;
@@ -14,7 +19,7 @@ typedef struct sortedNode {
     struct sortedNode *next;
 } sortedNode;
 
-
+sl_root *create_sl_root(void);
 occurrencyNode *create_occurrencyNode(int occurrency);
 sortedNode *create_sortedNode(char *);
 int compare_occurrencyNodes(const void *, const void *);

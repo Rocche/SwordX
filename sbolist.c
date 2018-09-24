@@ -1,6 +1,14 @@
 #include "utils.h"
 #include "sbolist.h"
 
+sl_root* create_sl_root(){
+    sl_root *sl_root;
+    sl_root = malloc(sizeof(sl_root));
+    check_heap(sl_root);
+    sl_root->oc_nodes = malloc(sizeof(occurrencyNode));
+    sl_root->elements = 0;
+}
+
 occurrencyNode *create_occurrencyNode(int occurrency)
 {
     occurrencyNode *oc_node;
