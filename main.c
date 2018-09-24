@@ -7,6 +7,7 @@
 #include <argp.h>
 #include <argz.h>
 #include <dirent.h>
+#include <time.h>
 
 #include "file_operations.h"
 #include "utils.h"
@@ -35,6 +36,10 @@ size_t file_blacklist_size = 0;
 trieNode* trie_root = NULL;
 /*output*/
 FILE* dest_fp = NULL;
+char* output_path = "swordx.out";
+
+/*log file*/
+FILE* log_fp = NULL;
 
 /*inizializza automaticamente l'opzione --version*/
 const char *argp_program_version = "version 1.0";
@@ -111,10 +116,15 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         sort_by_occurency = true;
         break;
     case 'o':
-        //dest_fp = arg;
+        output_path = arg;
         break;
     case 'l':
         log_flag = true;
+        log_fp = fopen(arg, "w");
+        if(log_fp == NULL){
+            perror("Could not open log file");
+            exit(EXIT_FAILURE);
+        }
         break;
     case ARGP_KEY_ARG:
         argz_add(&a->argz, &a->argz_len, arg);
@@ -137,14 +147,24 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
 //metodo che elabora le stringhe di un file
 void analyze_file(const char *path, trieNode* trie_node)
 {
+    /*variabili per il file di log*/
+    int cw = 0;
+    int iw = 0;
+    clock_t begin = clock();
+
     FILE *fptr = fopen(path, "r");
     if (fptr == NULL)
     {
         perror("Could not open file");
+        exit(EXIT_FAILURE);
     }
-
+    /*stringa contenenti i delimitatori delle parole*/
+    char* delimit = " \t\n\r\v\f,.;:-@";
+    /*inizializzazione linea del file*/
     char *line = NULL;
     size_t len = 0;
+
+
     while (getline(&line, &len, fptr) != -1)
     {
         char *word;
@@ -153,7 +173,7 @@ void analyze_file(const char *path, trieNode* trie_node)
         if (*(line + strlen(line) - 1) == '\n')
             *(line + strlen(line) - 1) = '\0'; // Strips \n from line
 
-        word = strtok_r(line, " ", &save);
+        word = strtok_r(line, delimit, &save);
 
         while (word != NULL)
         {
@@ -179,16 +199,24 @@ void analyze_file(const char *path, trieNode* trie_node)
             }
 
             if(is_valid){
-                //printf("%s\n", word);
+                cw++;
                 add_word(trie_root, word);
             }
-
-            word = strtok_r(NULL, " ", &save);
+            else{
+                iw++;
+            }
+            word = strtok_r(NULL, delimit, &save);
         }
     }
 
     fclose(fptr);
-    printf("\n\n");
+    //fermo il clock
+    clock_t end = clock();
+    double process_time = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%s, %d, %d, %f\n", path, cw, iw, process_time);
+    if(log_flag){
+        fprintf(log_fp, "%s, %d, %d, %f\n", path, cw, iw, process_time);
+    }
 }
 
 
@@ -218,6 +246,15 @@ void analyze_directory(const char *path, trieNode* trie_node)
                 strcat(new_path, filename);
                 //aggiungo carattere '/0'
                 *(new_path + strlen(new_path)) = '\0';
+
+                if(is_symbolic_link(new_path)){
+                    if(follow){
+                        analyze_file(new_path, trie_node);
+                    }
+                    else{
+                        printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", new_path);
+                    }
+                }
                 if (is_regular_file(new_path))
                 {
                     /*controlla che il file non sia nella blacklist*/
@@ -255,7 +292,6 @@ int main(int argc, char **argv)
     struct argp argp = {options, parse_opt, "<input1> <input2> ... <inputn>", "Count words occurencies in specified files or directories and save the reuslt in a .txt file"};
 
     
-
     if (argp_parse(&argp, argc, argv, 0, 0, &arguments) == 0)
     {
         /*salva l'argomento precedente*/
@@ -277,7 +313,7 @@ int main(int argc, char **argv)
                     analyze_file(argument, trie_root);
                 }
                 else{
-                    printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow", argument);
+                    printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", argument);
                 }
             }
             else if(is_regular_file(argument)){
@@ -291,9 +327,9 @@ int main(int argc, char **argv)
         free(arguments.argz);
     }
 
-    dest_fp = fopen("output.txt", "w");
+    dest_fp = fopen(output_path, "w");
     if(dest_fp == NULL){
-        perror("Cannot open file");
+        perror("Cannot open file\n");
         exit(EXIT_FAILURE);
     }
     if (!sort_by_occurency)
@@ -310,5 +346,10 @@ int main(int argc, char **argv)
         // print_sorted_list(dest_fp, sl_root);
     }
     fclose(dest_fp);
+
+    if(log_flag){
+        fclose(log_fp);
+    }
+
     return 0;
 }
