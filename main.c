@@ -36,6 +36,7 @@ size_t file_blacklist_size = 0;
 trieNode* trie_root = NULL;
 /*output*/
 FILE* dest_fp = NULL;
+char* output_path = "swordx.out";
 
 /*log file*/
 FILE* log_fp = NULL;
@@ -115,7 +116,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         sort_by_occurency = true;
         break;
     case 'o':
-        //dest_fp = arg;
+        output_path = arg;
         break;
     case 'l':
         log_flag = true;
@@ -198,16 +199,23 @@ void analyze_file(const char *path, trieNode* trie_node)
             }
 
             if(is_valid){
-                //printf("%s\n", word);
+                cw++;
                 add_word(trie_root, word);
             }
-
+            else{
+                iw++;
+            }
             word = strtok_r(NULL, delimit, &save);
         }
     }
     fclose(fptr);
     //fermo il clock
-    printf("\n\n");
+    clock_t end = clock();
+    double process_time = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%s, %d, %d, %f\n", path, cw, iw, process_time);
+    if(log_flag){
+        fprintf(log_fp, "%s, %d, %d, %f\n", path, cw, iw, process_time);
+    }
 }
 
 
@@ -237,6 +245,15 @@ void analyze_directory(const char *path, trieNode* trie_node)
                 strcat(new_path, filename);
                 //aggiungo carattere '/0'
                 *(new_path + strlen(new_path)) = '\0';
+
+                if(is_symbolic_link(new_path)){
+                    if(follow){
+                        analyze_file(new_path, trie_node);
+                    }
+                    else{
+                        printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", new_path);
+                    }
+                }
                 if (is_regular_file(new_path))
                 {
                     /*controlla che il file non sia nella blacklist*/
@@ -274,7 +291,6 @@ int main(int argc, char **argv)
     struct argp argp = {options, parse_opt, "<input1> <input2> ... <inputn>", "Count words occurencies in specified files or directories and save the reuslt in a .txt file"};
 
     
-
     if (argp_parse(&argp, argc, argv, 0, 0, &arguments) == 0)
     {
         /*salva l'argomento precedente*/
@@ -296,7 +312,7 @@ int main(int argc, char **argv)
                     analyze_file(argument, trie_root);
                 }
                 else{
-                    printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow", argument);
+                    printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", argument);
                 }
             }
             else if(is_regular_file(argument)){
@@ -310,9 +326,9 @@ int main(int argc, char **argv)
         free(arguments.argz);
     }
 
-    dest_fp = fopen("output.txt", "w");
+    dest_fp = fopen(output_path, "w");
     if(dest_fp == NULL){
-        perror("Cannot open file");
+        perror("Cannot open file\n");
         exit(EXIT_FAILURE);
     }
     if (!sort_by_occurency)
