@@ -359,6 +359,7 @@ int main(int argc, char **argv)
     /*struttura argp*/
     struct argp argp = {options, parse_opt, "<input1> <input2> ... <inputn>", "Count words occurencies in specified files or directories and save the reuslt in a file (swordx.out default)"};
 
+    //print_logo();
     /*se il comando è corretto*/
     if (argp_parse(&argp, argc, argv, 0, 0, &arguments) == 0)
     {
