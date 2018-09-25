@@ -24,7 +24,7 @@ all: swordx
 
 install:
 	@echo "Installing swordx....\n"
-	@cp ./binary/swordx /usr/local/bin/swordx
+	@cp ./bin/swordx /usr/local/bin/swordx
 	@echo "Done."
 
 uninstall:
