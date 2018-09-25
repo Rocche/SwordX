@@ -148,6 +148,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
             perror("Could not open log file");
             exit(EXIT_FAILURE);
         }
+        fprintf(log_fp, "FILE NAME, COUNTED WORDS, IGNORED WORDS, PROCESS TIME\n\n");
         break;
     case ARGP_KEY_ARG:
         /*argomento non accompagnato da opzioni: file o directory da processare*/
@@ -271,6 +272,8 @@ void analyze_file(const char *path, trieNode *trie_node)
     {
         fprintf(log_fp, "%s, %d, %d, %f\n", path, cw, iw, process_time);
     }
+
+    printf("Analyzed %s\n", path);
 }
 
 //metodo che elabora i file in una directory
@@ -320,11 +323,11 @@ void analyze_directory(const char *path, trieNode *trie_node)
                     }
                     else if (is_in_blacklist(new_path, file_blacklist, file_blacklist_size))
                     {
-                        printf("Saltato link %s: specificato come file da ignorare\n", new_path);
+                        printf("Skipped link %s: specified as file to be ignored\n", new_path);
                     }
                     else
                     {
-                        printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", new_path);
+                        printf("Skipped link %s: add -f or --follow option to analyze links too\n", new_path);
                     }
                 }
                 /*in caso di file regolare, si controlla che il file non sia nella blacklist*/
@@ -336,7 +339,7 @@ void analyze_directory(const char *path, trieNode *trie_node)
                     }
                     else
                     {
-                        printf("Saltato file %s: specificato come file da ignorare\n", new_path);
+                        printf("Skipped file %s: specified as file to be ignored\n", new_path);
                     }
                 }
                 /*in caso di directory, si richiama la funzione corrente ricorsivamente in caso di opzione --recursive*/
@@ -401,11 +404,11 @@ int main(int argc, char **argv)
                 }
                 else if (is_in_blacklist(argument, file_blacklist, file_blacklist_size))
                 {
-                    printf("Saltato link %s: specificato come file da ignorare\n", argument);
+                    printf("Skipped link %s: specified as file to be ignored\n", argument);
                 }
                 else
                 {
-                    printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", argument);
+                    printf("Skipped link %s: add -f or --follow option to analyze links too\n", argument);
                 }
             }
             else if (is_regular_file(argument))
@@ -417,7 +420,7 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                    printf("Saltato file %s: specificato come file da ignorare\n", argument);
+                    printf("Skipped file %s: specified as file to be ignored\n\n", argument);
                 }
             }
             else if (is_directory(argument))
@@ -425,7 +428,6 @@ int main(int argc, char **argv)
                 analyze_directory(argument, trie_root);
             }
         }
-        printf("\n");
         /*si libera la memoria allocata da argz*/
         free(arguments.argz);
     }
