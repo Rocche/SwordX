@@ -1,8 +1,0 @@
-FILE NAME, COUNTED WORDS, IGNORED WORDS, PROCESS TIME
-
-TestDirectory/PromessiSposi/p1.txt, 79, 4928, 0.000568
-TestDirectory/PromessiSposi/parte2.txt, 84, 6250, 0.000653
-TestDirectory/PromessiSposi/p2.txt, 84, 6250, 0.000527
-TestDirectory/ciao.txt, 2, 22, 0.000021
-TestDirectory/TestInTest/a.txt, 0, 26, 0.000010
-TestDirectory/io, 0, 2, 0.000007
