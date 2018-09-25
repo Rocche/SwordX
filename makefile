@@ -1,10 +1,10 @@
 CC=gcc
 CFLAGS= -I$(IDIR)
 
-BDIR=binary
-ODIR=object
-IDIR=include
-SDIR=source
+BDIR=bin
+ODIR=obj
+IDIR=inc
+SDIR=src
 
 _DEPS = trie.h sbolist.h memory_operations.h file_operations.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
