@@ -1,14 +1,13 @@
-#include "utils.h"
+#include "memory_operations.h"
 #include "sbolist.h"
 
 /*metodo che crea la radice della sorted list*/
 sl_root* create_sl_root(){
     /*allocazione della memoria con dimensione della struttura sl_root*/
     sl_root *sl_root;
-    sl_root = malloc(sizeof(sl_root));
-    check_heap(sl_root);
+    sl_root = malloc_object(sl_root, sizeof(sl_root));
     /*inizializzazione degli attributi della struttura sl_root*/
-    sl_root->oc_nodes = malloc(sizeof(occurrencyNode));
+    sl_root->oc_nodes = malloc_object(sl_root->oc_nodes, sizeof(occurrencyNode));
     sl_root->elements = 0;
 }
 
@@ -17,8 +16,7 @@ occurrencyNode *create_occurrencyNode(int occurrency)
 {
     /*allocazione della memoria*/
     occurrencyNode *oc_node;
-    oc_node = malloc(sizeof(occurrencyNode));
-    check_heap(oc_node);
+    oc_node = malloc_object(oc_node, sizeof(occurrencyNode));
     /*inizializzazione attributi*/
     oc_node->occurrency = occurrency;
     oc_node->first = NULL;
@@ -30,8 +28,7 @@ sortedNode *create_sortedNode(char *word)
 {
     /*allocazione in memoria*/
     sortedNode *sl_node;
-    sl_node = malloc(sizeof(sortedNode));
-    check_heap(sl_node);
+    sl_node = malloc_object(sl_node, sizeof(sortedNode));
     /*inizializzazione attributi*/
     sl_node->word = word;
     sl_node->next = NULL;
@@ -60,7 +57,7 @@ void print_sorted_list(FILE *dest_fp, sl_root *sl_root)
         while (sl_node != NULL)
         {
             /*si stampa la linea nel file */
-            fprintf(dest_fp, "%i %s\n", oc_node.occurrency, sl_node->word);
+            fprintf(dest_fp, "%s: %i\n", sl_node->word, oc_node.occurrency);
             sl_node = sl_node->next;
         }
     }

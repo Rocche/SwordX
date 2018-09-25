@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "utils.h"
 #include "sbolist.h"
 
 /* https://it.wikipedia.org/wiki/Caratteri_alfanumerici */

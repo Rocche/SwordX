@@ -4,6 +4,7 @@
 
 #include "sbolist.h"
 #include "trie.h"
+#include "memory_operations.h"
 
 /*translates int value into his charset's corresponding value*/
 char int_to_charset(int n)
@@ -49,8 +50,7 @@ int charset_to_int(char c)
 char *init_tw()
 {
     /*Allocates 2 char spaces (one for the next character to be added, one for the terminal character)*/
-    char *trie_word = calloc(2, sizeof(char));
-    check_heap(trie_word);
+    char *trie_word = calloc_object(trie_word, 2, sizeof(char));
     trie_word[1] = '\0';
     return trie_word;
 }
@@ -58,10 +58,9 @@ char *init_tw()
 /*increments trie_word size by 1*/
 char *reallocate_trie_word(char *trie_word)
 {
-    /*reallocates the memory ade *t_node = malloc(sizeof(trieNodeding 2 char spaces (one for the next character to be added and one for the terminal character)*/
-    trie_word = realloc(trie_word, sizeof(char) * (strlen(trie_word) + 2));
+    /*reallocates the memory of trie_word adding 2 char spaces (one for the next character to be added and one for the terminal character)*/
+    trie_word = realloc_object(trie_word, sizeof(char) * (strlen(trie_word) + 2));
     trie_word[strlen(trie_word) + 1] = '\0';
-    check_heap(trie_word);
     return trie_word;
 }
 
@@ -69,8 +68,7 @@ char *reallocate_trie_word(char *trie_word)
 trieNode *create_trieNode()
 {
     /*allocates memory space*/
-    trieNode *t_node = malloc(sizeof(trieNode));
-    check_heap(t_node);
+    trieNode *t_node = malloc_object(t_node, sizeof(trieNode));
     /*initialize attributes*/
     t_node->occurrencies = 0;
     for (int i = 0; i <= CHARSET; i++)
@@ -245,7 +243,7 @@ sl_root *sort_trie_by_occurrencies(trieNode *t_node, sl_root *sl_root)
 sl_root *add_to_sbolist(sl_root *sl_root, char *word, int occurrencies)
 {
     /*creates a temporary memory allocation for the word*/
-    char* str = malloc(strlen(word)+1);
+    char* str = malloc_object(str, strlen(word)+1);
     strcpy(str,word);
     /*initialize a new sl_node structure with the current word*/
     sortedNode* sl_node = create_sortedNode(str);
@@ -268,8 +266,7 @@ sl_root *add_to_sbolist(sl_root *sl_root, char *word, int occurrencies)
     /*sl_root has one more oc_node, so we increase elements counter*/
     sl_root->elements++;
     /*increase its allocation memory*/
-    sl_root->oc_nodes = realloc (sl_root->oc_nodes, sizeof(occurrencyNode)*(sl_root->elements));
-    check_heap(sl_root);
+    sl_root->oc_nodes = realloc_object(sl_root->oc_nodes, sizeof(occurrencyNode)*(sl_root->elements));
     /*the last oc_node will be the previously created pointer*/
     sl_root->oc_nodes[sl_root->elements-1] = *p_oc_node;
     return sl_root;
