@@ -25,22 +25,22 @@ bool sort_by_occurency = false;
 bool log_flag = false;
 
 /*word blacklist (--ignore)*/
-char** word_blacklist = NULL;
+char **word_blacklist = NULL;
 size_t word_blacklist_size = 0;
 
 /*file blacklist (--exclude)*/
-char** file_blacklist = NULL;
+char **file_blacklist = NULL;
 size_t file_blacklist_size = 0;
 
 /*trie*/
-trieNode* trie_root = NULL;
+trieNode *trie_root = NULL;
 
 /*output default swordx.out (altro se specificato come parametro)*/
-FILE* dest_fp = NULL;
-char* output_path = "swordx.out";
+FILE *dest_fp = NULL;
+char *output_path = "swordx.out";
 
 /*log file*/
-FILE* log_fp = NULL;
+FILE *log_fp = NULL;
 
 /*inizializza automaticamente l'opzione --version*/
 const char *argp_program_version = "version 1.0";
@@ -52,13 +52,14 @@ struct arguments
     size_t argz_len;
 };
 
-
 /*blacklist di parole da ignorare contenute in un file per l'opzione --ignore*/
-char** update_word_blacklist(const char* path){
+char **update_word_blacklist(const char *path)
+{
 
     /*apertura del file*/
-    FILE* fp = fopen(path, "r");
-    if(fp == NULL){
+    FILE *fp = fopen(path, "r");
+    if (fp == NULL)
+    {
         perror("Could not open the ignore file");
         exit(EXIT_FAILURE);
     }
@@ -71,15 +72,16 @@ char** update_word_blacklist(const char* path){
     while (getline(&line, &len, fp) != -1)
     {
         /*sostituisco \n con \0*/
-        if (*(line + strlen(line) - 1) == '\n'){
+        if (*(line + strlen(line) - 1) == '\n')
+        {
             *(line + strlen(line) - 1) = '\0';
         }
 
         /*realloc della lista con una stringa in più*/
-        word_blacklist = (char**)realloc(word_blacklist, (word_blacklist_size + 1)*sizeof(char*));
+        word_blacklist = (char **)realloc(word_blacklist, (word_blacklist_size + 1) * sizeof(char *));
         check_heap(word_blacklist);
         /*aggiungo la stringa contenuta nella linea*/
-        *(word_blacklist + word_blacklist_size) = (char*)malloc(strlen(line));
+        *(word_blacklist + word_blacklist_size) = (char *)malloc(strlen(line));
         check_heap(*(word_blacklist + word_blacklist_size));
         strcpy(*(word_blacklist + word_blacklist_size), line);
         /*aumento la dimensione della blacklist*/
@@ -90,12 +92,13 @@ char** update_word_blacklist(const char* path){
 }
 
 /*blacklist contenente i file da escludere per l'opzione --exclude*/
-char** update_file_blacklist(const char* file){
+char **update_file_blacklist(const char *file)
+{
     /*realloc della lista aumentando di una stringa*/
-    file_blacklist = (char**)realloc(file_blacklist, (file_blacklist_size + 1)*sizeof(char*));
+    file_blacklist = (char **)realloc(file_blacklist, (file_blacklist_size + 1) * sizeof(char *));
     check_heap(file_blacklist);
     /*aggiungo il path del file*/
-    *(file_blacklist + file_blacklist_size) = (char*)malloc(strlen(file));
+    *(file_blacklist + file_blacklist_size) = (char *)malloc(strlen(file));
     check_heap(*(file_blacklist + file_blacklist_size));
     strcpy(*(file_blacklist + file_blacklist_size), file);
     /*aumento la dimensione della blacklist*/
@@ -140,7 +143,8 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         log_flag = true;
         /*apertura del file di log con percorso arg*/
         log_fp = fopen(arg, "w");
-        if(log_fp == NULL){
+        if (log_fp == NULL)
+        {
             perror("Could not open log file");
             exit(EXIT_FAILURE);
         }
@@ -165,9 +169,8 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
     return 0;
 }
 
-
 /*metodo che elabora le stringhe di un file*/
-void analyze_file(const char *path, trieNode* trie_node)
+void analyze_file(const char *path, trieNode *trie_node)
 {
     /*variabili per il file di log*/
     int cw = 0;
@@ -184,7 +187,7 @@ void analyze_file(const char *path, trieNode* trie_node)
     }
 
     /*stringa contenente i delimitatori delle parole*/
-    char* delimit = " \t\n\r\v\f,.;:-@";
+    char *delimit = " \t\n\r\v\f,.;:-@";
 
     /*inizializzazione linee del file*/
     char *line = NULL;
@@ -220,29 +223,34 @@ void analyze_file(const char *path, trieNode* trie_node)
                 if (alpha)
                 {
                     /*si controlla se la stringa sia contenuta nella blacklist*/
-                    if(!is_alphabetical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size)){
+                    if (!is_alphabetical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size))
+                    {
                         is_valid = false;
                     }
                 }
                 else
                 {
                     /*si controlla se la stringa sia contenuta nella blacklist*/
-                    if(!is_alphanumerical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size)){
+                    if (!is_alphanumerical_string(word) || is_in_blacklist(word, word_blacklist, word_blacklist_size))
+                    {
                         is_valid = false;
                     }
                 }
             }
-            else{
+            else
+            {
                 is_valid = false;
             }
 
             /*se la stringa è valida, si aumenta il contatore cw per il file di log e si aggiunge la parola al trie*/
-            if(is_valid){
+            if (is_valid)
+            {
                 cw++;
                 add_word(trie_root, word);
             }
             /*altrimenti si incrementa il contatore iw*/
-            else{
+            else
+            {
                 iw++;
             }
             /*si estrae il prossimo token (in ogni chiamata successiva alla prima, strtok_r richiede NULL se si vuole specificare la stessa linea)*/
@@ -259,14 +267,14 @@ void analyze_file(const char *path, trieNode* trie_node)
     //printf("%s, %d, %d, %f\n", path, cw, iw, process_time);
 
     /*se è stata specificata l'opzione --log, si stampa la linea con le informazioni raccolte dall'analisi*/
-    if(log_flag){
+    if (log_flag)
+    {
         fprintf(log_fp, "%s, %d, %d, %f\n", path, cw, iw, process_time);
     }
 }
 
-
 //metodo che elabora i file in una directory
-void analyze_directory(const char *path, trieNode* trie_node)
+void analyze_directory(const char *path, trieNode *trie_node)
 {
     /*puntatore alla directory*/
     DIR *dir;
@@ -287,7 +295,7 @@ void analyze_directory(const char *path, trieNode* trie_node)
                 char *new_path = (char *)malloc(path_size * sizeof(char));
                 check_heap(new_path);
                 strcpy(new_path, path);
-                
+
                 /*se non è presente il carattere '/' alla fine del percorso della directory corrente lo aggiungo*/
                 if (*(new_path + strlen(new_path) - 1) != '/')
                 {
@@ -304,24 +312,30 @@ void analyze_directory(const char *path, trieNode* trie_node)
                 se il file è un link, si controlla che sia abilitata l'opzione --follow
                 si controlla anche che il link non sia nella blacklist
                 */
-                if(is_symbolic_link(new_path)){
-                    if(follow && !is_in_blacklist(new_path, file_blacklist, file_blacklist_size)){
+                if (is_symbolic_link(new_path))
+                {
+                    if (follow && !is_in_blacklist(new_path, file_blacklist, file_blacklist_size))
+                    {
                         analyze_file(new_path, trie_node);
                     }
-                    else if(is_in_blacklist(new_path, file_blacklist, file_blacklist_size)){
+                    else if (is_in_blacklist(new_path, file_blacklist, file_blacklist_size))
+                    {
                         printf("Saltato link %s: specificato come file da ignorare\n", new_path);
                     }
-                    else{
+                    else
+                    {
                         printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", new_path);
                     }
                 }
                 /*in caso di file regolare, si controlla che il file non sia nella blacklist*/
                 if (is_regular_file(new_path))
                 {
-                    if(!is_in_blacklist(new_path, file_blacklist, file_blacklist_size)){
+                    if (!is_in_blacklist(new_path, file_blacklist, file_blacklist_size))
+                    {
                         analyze_file(new_path, trie_node);
                     }
-                    else{
+                    else
+                    {
                         printf("Saltato file %s: specificato come file da ignorare\n", new_path);
                     }
                 }
@@ -378,28 +392,36 @@ int main(int argc, char **argv)
 
             /*si controlla il tipo del file*/
 
-            if(is_symbolic_link(argument)){
+            if (is_symbolic_link(argument))
+            {
                 /*controlli sull'opzione follow e file_blacklist*/
-                if(follow && !is_in_blacklist(argument, file_blacklist, file_blacklist_size)){
-                        analyze_file(argument, trie_root);
-                    }
-                    else if(is_in_blacklist(argument, file_blacklist, file_blacklist_size)){
-                        printf("Saltato link %s: specificato come file da ignorare\n", argument);
-                    }
-                    else{
-                        printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", argument);
-                    }
-            }
-            else if(is_regular_file(argument)){
-                /*controlli sulla file_blacklist*/
-                if(!is_in_blacklist(argument, file_blacklist, file_blacklist_size)){
+                if (follow && !is_in_blacklist(argument, file_blacklist, file_blacklist_size))
+                {
                     analyze_file(argument, trie_root);
                 }
-                else{
+                else if (is_in_blacklist(argument, file_blacklist, file_blacklist_size))
+                {
+                    printf("Saltato link %s: specificato come file da ignorare\n", argument);
+                }
+                else
+                {
+                    printf("Saltato link %s: per abilitare i link, aggiungere opzione -f o --follow\n", argument);
+                }
+            }
+            else if (is_regular_file(argument))
+            {
+                /*controlli sulla file_blacklist*/
+                if (!is_in_blacklist(argument, file_blacklist, file_blacklist_size))
+                {
+                    analyze_file(argument, trie_root);
+                }
+                else
+                {
                     printf("Saltato file %s: specificato come file da ignorare\n", argument);
                 }
             }
-            else if(is_directory(argument)){
+            else if (is_directory(argument))
+            {
                 analyze_directory(argument, trie_root);
             }
         }
@@ -410,26 +432,39 @@ int main(int argc, char **argv)
 
     /*apro il file di output*/
     dest_fp = fopen(output_path, "w");
-    if(dest_fp == NULL){
+    if (dest_fp == NULL)
+    {
         perror("Cannot open file\n");
         exit(EXIT_FAILURE);
     }
-    /*se non è attivata l'opzione --sortbyoccurrency, stampa il trie nel file*/
+    /*se non è attivata l'opzione --sortbyoccurrency, stampa il trie nel file di destinazione*/
     if (!sort_by_occurency)
     {
         print_trie(dest_fp, trie_root);
-    } 
+    }
     /*altrimenti ordina per occorrenza*/
     else
     {
-        sl_root* sl_root = create_sl_root();
-        sl_root = sort_trie_by_occurrencies(trie_root,sl_root);
+        /*si crea il nodo root della sorted list*/
+        sl_root *sl_root = create_sl_root();
+        /*metodo che inserisce le parole del trie nella sorted list*/
+        sl_root = sort_trie_by_occurrencies(trie_root, sl_root);
+        /*si ordina per occorrenza*/
         qsort(sl_root->oc_nodes, sl_root->elements, sizeof(occurrencyNode), compare_occurrencyNodes);
+        /*stampa nel file di destinazione*/
         print_sorted_list(dest_fp, sl_root);
+
+        destroy_sorted_list(sl_root);
     }
+    /*chiusura del file*/
     fclose(dest_fp);
 
-    if(log_flag){
+    /*free trie's memory*/
+    destroy_trie(trie_root);
+
+    /*se è stata specificata l'opzione --log, bisogna chiudere il file già aperto in precedenza*/
+    if (log_flag)
+    {
         fclose(log_fp);
     }
 
