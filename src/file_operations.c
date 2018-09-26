@@ -6,28 +6,27 @@
 #include <stdbool.h>
 
 #include "file_operations.h"
-#include "utils.h"
+#include "memory_operations.h"
 
-//metodo che inizializza l'allocazione di memoria della stringa da far elaborare
-//al trie. La dimensione è 1 carattere + carattere terminazione '\0'
+/*Initialize the memory space for a string*/
 char *init_current_string()
 {
-    char *str = (char *)malloc(sizeof(char));
-    check_heap(str);
+    char *str = malloc_object(str, sizeof(char));
     return str;
 }
 
-//metodo che aggiunge un carattere alla stringa di riferimento
+/*Adds a character to an allocated string*/
 void add_char_to_str(char c, char *str)
 {
+    /*caluclates the new length and reallocates the memory space*/
     int new_length = strlen(str) + sizeof(char) * 2;
-    str = (char *)realloc(str, new_length);
-    check_heap(str);
+    str = realloc_object(str, new_length);
+    /*adds the input character and terminal character*/
     *(str + new_length - 2) = c;
     *(str + new_length - 1) = '\0';
 }
 
-//metodo che controlla se il file specificato è regular
+/*check if string is a regular file's path*/
 bool is_regular_file(const char *path)
 {
     struct stat buf;
@@ -38,7 +37,7 @@ bool is_regular_file(const char *path)
     return S_ISREG(buf.st_mode) ? true : false;
 }
 
-//metodo che controlla se la stringa passata è il percorso per una directory
+/*check if string is a directory's path*/
 bool is_directory(const char *path)
 {
     struct stat buf;
@@ -49,7 +48,7 @@ bool is_directory(const char *path)
     return S_ISDIR(buf.st_mode) ? true : false;
 }
 
-//controlla se la stringa passata è un symbolic link
+/*check if string is a symbolic link's path*/
 bool is_symbolic_link(const char *path)
 {
     struct stat buf;
@@ -60,8 +59,9 @@ bool is_symbolic_link(const char *path)
     return S_ISLNK(buf.st_mode) ? true : false;
 }
 
-
+/*check if string is composed by alphanumerical characters only*/
 bool is_alphanumerical_string(char* word){
+    /*checks every character of the string*/
     for (int i = 0; i < strlen(word); i++)
     {
         if (!isalpha(*(word + i)) && !isdigit(*(word + i)))
@@ -72,7 +72,9 @@ bool is_alphanumerical_string(char* word){
     return true;
 }
 
+/*check if string is composed by alphabetical characters only*/
 bool is_alphabetical_string(char* word){
+    /*checks every character of the string*/
     for (int i = 0; i < strlen(word); i++)
     {
         if (!isalpha(*(word + i)))
@@ -83,8 +85,12 @@ bool is_alphabetical_string(char* word){
     return true;
 }
 
+
+/*check if a string is in a blacklist*/
 bool is_in_blacklist(char* word, char** blacklist, size_t blacklist_size){
+    /*checks every string of the list*/
     for(int i = 0; i < blacklist_size; i++){
+        /*compares the input word to the current blacklist's string*/
         if(strcmp(word, *(blacklist + i)) == 0){
             return true;
         }
