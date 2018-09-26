@@ -7,6 +7,8 @@
 #include <argz.h>
 #include <dirent.h>
 #include <time.h>
+#include <glob.h>
+#include <fnmatch.h>
 
 #include "file_operations.h"
 #include "memory_operations.h"
@@ -49,6 +51,10 @@ struct arguments
     char *argz;
     size_t argz_len;
 };
+
+/*wildcard*/
+char** wildcards_list = NULL;
+size_t wildcards_list_size = 0;
 
 /*word blacklist --ignore*/
 char **update_word_blacklist(const char *path)
@@ -99,6 +105,16 @@ char **update_file_blacklist(const char *file)
     file_blacklist_size++;
 }
 
+/*wildcards list --wildcard*/
+char **update_wildcard_list(const char *wildcard){
+    /*reallocates wildcards list size*/
+    wildcards_list = realloc_object(wildcards_list, (wildcards_list_size + 1) * sizeof(char*));
+    /*adds wildcard to list*/
+    *(wildcards_list + wildcards_list_size) = malloc_object(*(wildcards_list + wildcards_list_size), strlen(wildcard));
+    strcpy(*(wildcards_list + wildcards_list_size), wildcard);
+    /*increases size counter*/
+    wildcards_list_size++;
+}
 /*actions based on option*/
 static int parse_opt(int key, char *arg, struct argp_state *state)
 {
@@ -145,6 +161,11 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
         /*print first line*/
         fprintf(log_fp, "FILE NAME, COUNTED WORDS, IGNORED WORDS, PROCESS TIME\n\n");
         break;
+    case 'w':
+        /*adds wildcard to wildacrd_list*/
+        update_wildcard_list(arg);
+        printf("%s\n", arg);
+        break;
     case ARGP_KEY_ARG:
         /*argument without option: file or directory to precess*/
         argz_add(&a->argz, &a->argz_len, arg);
@@ -168,6 +189,22 @@ static int parse_opt(int key, char *arg, struct argp_state *state)
 /*Method that processes a file*/
 void analyze_file(const char *path, trieNode *trie_node)
 {
+    /*first check if file corresponds to wildcard (if wildcard_list is not empty)*/
+    if(wildcards_list_size != 0){
+        bool is_valid_file = false;
+        /*check all wildcards*/
+        for(int i = 0; i < wildcards_list_size; i++){
+            /*if fnmatch returns 0, file is accepted, otherwise file has to be skipped*/
+            if(fnmatch(wildcards_list[i], path, 0) == 0){
+                is_valid_file = true;
+                break;
+            }
+        }
+        if(!is_valid_file){
+            printf("Skipping %s: file doesn't correspond to given wildcard\n", path);
+            return;
+        }
+    }
     /*log variables*/
     int cw = 0;
     int iw = 0;
@@ -361,6 +398,7 @@ int main(int argc, char **argv)
         {"sortbyoccurrency", 's', 0, 0, "The analysis sorts words by occurency"},
         {"output", 'o', "<file>", 0, "Specify the output file (if not set, it will be automatically \"swordx.out\""},
         {"log", 'l', "<file>", 0, "At the end create a log file containing stats foreach file processed"},
+        {"wildcard", 'w', "<wildcard>", 0, "Select only files corresponding to <wildcard> (REMEMBER: special characters requires '\\' escape characer)"},
         {0}};
 
     /*arguments structure (argz.h)*/
