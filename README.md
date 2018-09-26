@@ -13,6 +13,12 @@ After cloning SwordX folder, go into it and, from command line:
   ```
   Now you should be able to run swordx command from anywhere in your filesystem. Make sure you run it as administrator (it avoids permissions problems).
   
+## Uninstall
+To uninstall the program, go to SwordX directory and type:
+```shell
+  sudo make uninstall
+```
+  
 ## Examples
   ```shell
   swordx test.txt
