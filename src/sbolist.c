@@ -1,44 +1,43 @@
 #include "memory_operations.h"
 #include "sbolist.h"
 
-/*metodo che crea la radice della sorted list*/
+/*Creates sorted list's root*/
 sl_root* create_sl_root(){
-    /*allocazione della memoria con dimensione della struttura sl_root*/
+    /*Memory allocation*/
     sl_root *sl_root;
     sl_root = malloc_object(sl_root, sizeof(sl_root));
-    /*inizializzazione degli attributi della struttura sl_root*/
+    /*Initializes attributes*/
     sl_root->oc_nodes = malloc_object(sl_root->oc_nodes, sizeof(occurrencyNode));
     sl_root->elements = 0;
 }
 
-/*metodo che crea un occurency node*/
+/*Creates an occurency node*/
 occurrencyNode *create_occurrencyNode(int occurrency)
 {
-    /*allocazione della memoria*/
+    /*Memory allocation*/
     occurrencyNode *oc_node;
     oc_node = malloc_object(oc_node, sizeof(occurrencyNode));
-    /*inizializzazione attributi*/
+    /*Initializes attributes*/
     oc_node->occurrency = occurrency;
     oc_node->first = NULL;
     return oc_node;
 }
 
-/*metodo che crea un sorted node*/
+/*Creates a sortedNode*/
 sortedNode *create_sortedNode(char *word)
 {
-    /*allocazione in memoria*/
+    /*Memory allocation*/
     sortedNode *sl_node;
     sl_node = malloc_object(sl_node, sizeof(sortedNode));
-    /*inizializzazione attributi*/
+    /*Initializes attrivutes*/
     sl_node->word = word;
     sl_node->next = NULL;
     return sl_node;
 }
 
 /*
-metodo usato dal qsort per la comparazione tra due nodi
-se ritorna un valore negativo, l'ordine dei due nodi rimane lo stesso
-altrimenti viene cambiato dal qsort
+Method used by qsort to decide the order of a pair of nodes,
+if returns positive value, qsort will change the order
 */
 int compare_occurrencyNodes(const void *node1, const void *node2)
 {
@@ -46,17 +45,17 @@ int compare_occurrencyNodes(const void *node1, const void *node2)
            ((occurrencyNode *)node2)->occurrency;
 }
 
-/*metodo che stampa nel file di destinazione il trie (nel caso di ordine alfabetico)*/
+/*prints trie's words in alphabetical order*/
 void print_sorted_list(FILE *dest_fp, sl_root *sl_root)
 {
-    /*scorre tutti gli occurrency node contenuti nel root della sorted list*/
+    /*check all occurency nodes*/
     for ( int i=0; i<sl_root->elements ; i++ ){
         occurrencyNode oc_node = (sl_root->oc_nodes[i]); 
-        /*si scorrono tutti i sorted node dell'occurency node di riferimento*/       
+        /*take all current occurrency node's sl_nodes*/       
         sortedNode *sl_node = oc_node.first;
         while (sl_node != NULL)
         {
-            /*si stampa la linea nel file */
+            /*print the line in output file */
             fprintf(dest_fp, "%s: %i\n", sl_node->word, oc_node.occurrency);
             sl_node = sl_node->next;
         }
