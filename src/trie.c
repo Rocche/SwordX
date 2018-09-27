@@ -191,7 +191,7 @@ void print_trie(FILE *file, trieNode *node)
             print_trie(file, node->children[i]);
         }
     }
-    /*adjust triue_word before going back to the previous node of the trie structure*/
+    /*adjust trie_word before going back to the previous node of the trie structure*/
     trie_word[strlen(trie_word) - 1] = '\0';
 }
 

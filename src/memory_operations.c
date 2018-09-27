@@ -7,7 +7,7 @@ void check_heap(void *object)
 {
     if (object == NULL)
     {
-        perror("Errore nell'allocazione della memoria.");
+        perror("ERROR: Allocation memory error\n");
         exit(EXIT_FAILURE);
     }
 }

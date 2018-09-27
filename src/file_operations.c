@@ -8,24 +8,6 @@
 #include "file_operations.h"
 #include "memory_operations.h"
 
-/*Initialize the memory space for a string*/
-char *init_current_string()
-{
-    char *str = malloc_object(str, sizeof(char));
-    return str;
-}
-
-/*Adds a character to an allocated string*/
-void add_char_to_str(char c, char *str)
-{
-    /*caluclates the new length and reallocates the memory space*/
-    int new_length = strlen(str) + sizeof(char) * 2;
-    str = realloc_object(str, new_length);
-    /*adds the input character and terminal character*/
-    *(str + new_length - 2) = c;
-    *(str + new_length - 1) = '\0';
-}
-
 /*check if string is a regular file's path*/
 bool is_regular_file(const char *path)
 {
