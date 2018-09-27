@@ -351,7 +351,7 @@ void analyze_directory(const char *path, trieNode *trie_node)
                     {
                         printf("Skipped link %s: specified as file to be ignored\n", new_path);
                     }
-                    else
+                    else if(!follow)
                     {
                         printf("Skipped link %s: add -f or --follow option to analyze links too\n", new_path);
                     }
@@ -434,7 +434,7 @@ int main(int argc, char **argv)
                 {
                     printf("Skipped link %s: specified as file to be ignored\n", argument);
                 }
-                else
+                else if(!follow)
                 {
                     printf("Skipped link %s: add -f or --follow option to analyze links too\n", argument);
                 }
