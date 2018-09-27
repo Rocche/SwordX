@@ -7,7 +7,6 @@
 #include <argz.h>
 #include <dirent.h>
 #include <time.h>
-#include <glob.h>
 #include <fnmatch.h>
 
 #include "file_operations.h"
