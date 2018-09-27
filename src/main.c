@@ -448,7 +448,7 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                    printf("Skipped file %s: specified as file to be ignored\n\n", argument);
+                    printf("Skipped file %s: specified as file to be ignored\n", argument);
                 }
             }
             else if (is_directory(argument))
