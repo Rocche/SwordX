@@ -357,7 +357,7 @@ void analyze_directory(const char *path, trieNode *trie_node)
                     }
                 }
                 /*if regular file, checks if it is in file_blacklist*/
-                if (is_regular_file(new_path))
+                else if (is_regular_file(new_path))
                 {
                     if (!is_in_blacklist(new_path, file_blacklist, file_blacklist_size))
                     {
@@ -369,7 +369,7 @@ void analyze_directory(const char *path, trieNode *trie_node)
                     }
                 }
                 /*if directory, checks if --recursive is enabled and, in that case, recursively call current function*/
-                if (is_directory(new_path) && recursive)
+                else if (is_directory(new_path) && recursive)
                 {
                     analyze_directory(new_path, trie_node);
                 }
