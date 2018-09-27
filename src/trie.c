@@ -13,7 +13,7 @@ char int_to_charset(int n)
     {
         return (n + BASE_DIGIT);
     }
-    else if (n >= CHAR_OFFSET && n <= CHARSET)
+    else if (n >= CHAR_OFFSET && n < CHARSET)
     {
         return (n - CHAR_OFFSET + BASE_CHAR);
     }
@@ -71,7 +71,7 @@ trieNode *create_trieNode()
     trieNode *t_node = malloc_object(t_node, sizeof(trieNode));
     /*initialize attributes*/
     t_node->occurrencies = 0;
-    for (int i = 0; i <= CHARSET; i++)
+    for (int i = 0; i < CHARSET; i++)
     {
         t_node->children[i] = NULL;
     }
@@ -173,7 +173,7 @@ void print_trie(FILE *file, trieNode *node)
     }
 
     /*takes all children nodes*/
-    for (int i = 0; i <= CHARSET; i++)
+    for (int i = 0; i < CHARSET; i++)
     {
         /*checks if children node exists and convert int value to charset*/
         if (node->children[i] != NULL)
@@ -215,7 +215,7 @@ sl_root *sort_trie_by_occurrencies(trieNode *t_node, sl_root *sl_root)
     }
 
     /*takes all children nodes*/
-    for (int i = CHARSET; i >= 0; i--)
+    for (int i = CHARSET - 1; i >= 0; i--)
     {
         /*checks if children node exists, converts int value to charset and recursively call current function with child node*/
         if (t_node->children[i] != NULL)
@@ -275,7 +275,7 @@ sl_root *add_to_sbolist(sl_root *sl_root, char *word, int occurrencies)
 /*Free trie structure's allocated memory starting from a specified node*/
 void destroy_trie(trieNode* node){
     /*free node's allocated memory*/
-    for (int i = 0; i <= CHARSET; i++)
+    for (int i = 0; i < CHARSET; i++)
     {
         if (node->children[i] != NULL)
         {

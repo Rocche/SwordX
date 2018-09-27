@@ -8,7 +8,7 @@
 /* https://it.wikipedia.org/wiki/Caratteri_alfanumerici */
 
 /*Charset macro: contains digits (from 0 to 9) and characters (from a to z)*/
-#define CHARSET 35 //   10 digits + 26 characters
+#define CHARSET 36 //   10 digits + 26 characters
 
 /*Constants for CHARSET convertions*/
 static const int LOWERCASE_OFFSET = 'a' - 'A';
