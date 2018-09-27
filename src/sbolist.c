@@ -53,27 +53,11 @@ void print_sorted_list(FILE *dest_fp, sl_root *sl_root)
         occurrencyNode oc_node = (sl_root->oc_nodes[i]); 
         /*take all current occurrency node's sl_nodes*/       
         sortedNode *sl_node = oc_node.first;
+        sortedNode* next;
         while (sl_node != NULL)
         {
             /*print the line in output file */
             fprintf(dest_fp, "%s: %i\n", sl_node->word, oc_node.occurrency);
-            sl_node = sl_node->next;
-        }
-    }
-}
-
-/*free sorted list's allocated memory*/
-void destroy_sorted_list(sl_root *sl_root)
-{
-    /*take occurency nodes one by one*/
-    for ( int i=0; i<sl_root->elements ; i++ ){
-        occurrencyNode oc_node = (sl_root->oc_nodes[i]);   
-        /*take the first sl_node of the current occurency group*/     
-        sortedNode *sl_node = oc_node.first;
-        sortedNode* next;
-        /*take all sl_nodes of current occurency group*/
-        while (sl_node != NULL)
-        {
             next = sl_node->next;
             /*free sl_node allocated memory*/
             free(sl_node);

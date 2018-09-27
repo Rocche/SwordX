@@ -476,6 +476,7 @@ int main(int argc, char **argv)
     if (!sort_by_occurency)
     {
         print_trie(dest_fp, trie_root);
+
     }
     /*otherwise print in occurrency order*/
     else
@@ -489,14 +490,9 @@ int main(int argc, char **argv)
         /*prints the list in output file*/
         print_sorted_list(dest_fp, sl_root);
 
-        /*free sorted list memory space*/
-        destroy_sorted_list(sl_root);
     }
     /*close output file*/
     fclose(dest_fp);
-
-    /*free trie's memory*/
-    destroy_trie(trie_root);
 
     /*if --log is set, we have to close log file*/
     if (log_flag)

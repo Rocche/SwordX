@@ -193,6 +193,10 @@ void print_trie(FILE *file, trieNode *node)
     }
     /*adjust trie_word before going back to the previous node of the trie structure*/
     trie_word[strlen(trie_word) - 1] = '\0';
+
+    /*free the current node*/
+    free(node);
+
 }
 
 /*Inserts trie's words in a sl_root structure containing words ordered by occurrency*/
@@ -235,6 +239,9 @@ sl_root *sort_trie_by_occurrencies(trieNode *t_node, sl_root *sl_root)
     /*adjust triue_word before going back to the previous node of the trie structure*/
     trie_word[strlen(trie_word) - 1] = '\0';
 
+    /*free the input node*/
+    free(t_node);
+
     /*returns the sl_root structure*/
     return sl_root;
 }
@@ -270,18 +277,4 @@ sl_root *add_to_sbolist(sl_root *sl_root, char *word, int occurrencies)
     /*the last oc_node will be the previously created pointer*/
     sl_root->oc_nodes[sl_root->elements-1] = *p_oc_node;
     return sl_root;
-}
-
-/*Free trie structure's allocated memory starting from a specified node*/
-void destroy_trie(trieNode* node){
-    /*free node's allocated memory*/
-    for (int i = 0; i < CHARSET; i++)
-    {
-        if (node->children[i] != NULL)
-        {
-            destroy_trie(node->children[i]);
-        }
-    }
-    /*free the input node*/
-    free(node);
 }

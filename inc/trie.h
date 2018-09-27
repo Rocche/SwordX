@@ -57,7 +57,4 @@ sl_root *sort_trie_by_occurrencies(trieNode *, sl_root*);
 /*Adds a trie_word to the sorted list*/
 sl_root *add_to_sbolist(sl_root*, char *, int);
 
-/*Free trie's allocated memory space*/
-void destroy_trie(trieNode*);
-
 #endif // TRIE_H_INCLUDED

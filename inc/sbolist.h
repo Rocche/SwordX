@@ -49,7 +49,4 @@ int compare_occurrencyNodes(const void *, const void *);
 /*method used to print the sorted list in the output file*/
 void print_sorted_list(FILE *, sl_root*);
 
-/*method used to free all the sorted list structure's allocated memory*/
-void destroy_sorted_list(sl_root*);
-
 #endif // SORTED_LIST_H_INCLUDED
